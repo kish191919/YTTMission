@@ -1,89 +1,105 @@
 import Link from 'next/link'
-import { Heart, Globe, Camera, ChevronRight, Users, MapPin, Award } from 'lucide-react'
+import Image from 'next/image'
+import { Heart, Camera, ChevronRight, Award } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import HeroSlideshow from '@/components/HeroSlideshow'
 
-/* ── 임팩트 숫자 섹션 ─────────────────────────── */
-function ImpactStats() {
-  const stats = [
-    { icon: Award, value: '1개', label: '올림픽 금메달', sub: '1988 서울 올림픽' },
-    { icon: Globe, value: '5개국+', label: '선교 방문국', sub: '몽골·중국·아시아' },
-    { icon: Users, value: '30년+', label: '선교 사역', sub: '꾸준한 헌신' },
-    { icon: MapPin, value: '열방', label: '향한 비전', sub: '탁구를 통한 복음' },
-  ]
-
+/* ── 히어로 CTA 섹션 ─────────────────────────── */
+function HeroCtaSection() {
   return (
-    <section className="bg-white py-16">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {stats.map(({ icon: Icon, value, label, sub }) => (
-            <div key={label} className="text-center p-6 rounded-2xl bg-amber-50 border border-amber-100">
-              <div className="w-12 h-12 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Icon size={22} className="text-white" />
-              </div>
-              <div className="text-2xl md:text-3xl font-black text-amber-700 mb-1">{value}</div>
-              <div className="text-sm font-semibold text-stone-700 mb-0.5">{label}</div>
-              <div className="text-xs text-stone-400">{sub}</div>
-            </div>
-          ))}
+    <section className="py-12 text-center bg-white">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="inline-flex items-center gap-2 bg-amber-600/20 border border-amber-500/40 text-amber-700 text-sm px-4 py-1.5 rounded-full mb-4">
+          <Award size={14} />
+          1988 서울 올림픽 탁구 금메달리스트
+        </div>
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-stone-800 mb-3 leading-tight">
+          탁구로 세상을 품고,<br />
+          <span className="text-amber-600">복음으로 열방을 섬깁니다</span>
+        </h1>
+        <p className="text-sm md:text-base text-stone-600 mb-6 max-w-2xl mx-auto leading-relaxed">
+          메달을 넘어 더 큰 사명으로 —<br />
+          양영자 선교사와 함께하는 탁구 선교의 여정에 동참하세요.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="https://ihappynanum.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 rounded-full transition-all duration-200 shadow-lg hover:-translate-y-0.5 text-base"
+          >
+            <Heart size={16} />
+            선교 후원하기
+          </Link>
+          <Link
+            href="/about"
+            className="inline-flex items-center justify-center gap-2 border-2 border-amber-600 text-amber-700 hover:bg-amber-600 hover:text-white font-semibold px-6 py-3 rounded-full transition-all duration-200 text-base"
+          >
+            선교사 소개
+            <ChevronRight size={16} />
+          </Link>
         </div>
       </div>
     </section>
   )
 }
 
-/* ── 스토리 섹션 ─────────────────────────────── */
-function Story() {
+
+/* ── 선교사 인사말 섹션 ──────────────────────── */
+function MissionaryGreeting() {
   return (
     <section className="py-20" style={{ backgroundColor: '#faf5eb' }}>
       <div className="max-w-6xl mx-auto px-4">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="relative">
-            <div className="aspect-[4/5] bg-gradient-to-br from-amber-200 to-amber-400 rounded-3xl flex items-center justify-center shadow-xl">
-              <div className="text-center text-amber-800">
-                <div className="text-6xl mb-3">🏓</div>
-                <p className="text-sm font-medium opacity-70">양영자 선교사</p>
-              </div>
-            </div>
-            <div className="absolute -bottom-4 -right-4 bg-amber-600 text-white rounded-2xl px-5 py-3 shadow-lg">
-              <div className="text-2xl font-black">1988</div>
-              <div className="text-xs font-medium opacity-80">서울 올림픽 금메달</div>
+        <div className="grid md:grid-cols-5 gap-12 items-start">
+          {/* 텍스트 */}
+          <div className="md:col-span-3 order-2 md:order-1">
+            <h2 className="text-2xl md:text-3xl font-bold text-stone-800 mb-8 leading-snug">
+              우리를 사랑하시는 주님 안에서 인사드립니다.
+            </h2>
+            <div className="space-y-5 text-stone-600 leading-relaxed">
+              <p>
+                1988년 9월 30일. 그 날은 제가 평생 잊을 수 없는 날입니다. 그 날은 올림픽에서
+                제가 현정화 선수와 함께 탁구 역사상 최초의 올림픽 탁구 금메달을 딴 날입니다.
+              </p>
+              <p>
+                그 메달은 하루 아침에 이루어진 것이 아니었습니다. 어렸을 때에 탁구일지에
+                대한민국을 빛내는 국가대표선수가 되고 싶다는 꿈을 적었고, 국제대회에서
+                메달을 따고 싶다는 꿈을 적었습니다.
+              </p>
+              <p>
+                그러나, 그 꿈을 이루는 데에는 고된 훈련이 따랐고, 몸은 몸대로 너무 아팠고,
+                탁구를 그만둬야 하나라는 생각이 들 정도로 힘든 시간들도 있었습니다. 그러나
+                결국 제가 꿈꿨던 국가대표가 되었고, 국제대회에서도 각종 메달들을 땄습니다.
+                그리고, 온 국민의 응원과 성원으로 올림픽 금메달도 땄습니다.
+              </p>
+              <p>
+                1983년 여름의 어느 날을 저는 또 잊을 수가 없습니다...(계속)
+              </p>
             </div>
           </div>
 
-          <div>
-            <span className="inline-block text-amber-600 font-semibold text-sm uppercase tracking-wider mb-3">
-              선교사의 이야기
-            </span>
-            <h2 className="text-3xl md:text-4xl font-black text-stone-800 mb-6 leading-tight">
-              메달을 넘어,<br />
-              더 큰 사명으로
-            </h2>
-            <div className="space-y-4 text-stone-600 leading-relaxed">
-              <p>
-                1988년 9월 30일, 서울 올림픽 탁구 경기장. 현정화 선수와 함께 역사상 최초의
-                올림픽 탁구 금메달을 목에 건 그 순간, 양영자 선수의 인생은 영원히 바뀌었습니다.
-              </p>
-              <p>
-                그러나 더 큰 변화는 그 이후에 찾아왔습니다. 하나님의 부르심 앞에 선 양영자
-                선교사는 탁구채를 내려놓는 대신, 탁구를 통해 세상에 복음을 전하는
-                새로운 여정을 시작했습니다.
-              </p>
-              <p>
-                오늘도 몽골과 아시아 각지에서, 탁구공 하나가 다리가 되어
-                마음과 마음을 연결하고 있습니다.
-              </p>
-            </div>
-            <div className="mt-8">
-              <Link
-                href="/about"
-                className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold px-6 py-3 rounded-full transition-all duration-200 shadow-md hover:shadow-lg"
-              >
-                전체 이야기 보기
-                <ChevronRight size={16} />
-              </Link>
+          {/* 사진 */}
+          <div className="md:col-span-2 order-1 md:order-2">
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
+              <Image
+                src="/images/yttm.jpeg"
+                alt="양영자 선교사"
+                fill
+                className="object-cover object-top"
+                sizes="(max-width: 768px) 100vw, 40vw"
+              />
             </div>
           </div>
+        </div>
+
+        {/* 버튼 */}
+        <div className="text-center mt-12">
+          <Link
+            href="/about"
+            className="inline-flex items-center justify-center gap-2 bg-stone-700 hover:bg-stone-800 text-white font-semibold px-8 py-3 rounded-sm transition-all duration-200"
+          >
+            양영자 선교사 인사말
+          </Link>
         </div>
       </div>
     </section>
@@ -262,8 +278,8 @@ export default async function HomePage() {
   return (
     <>
       <HeroSlideshow items={heroItems ?? []} />
-      <ImpactStats />
-      <Story />
+      <HeroCtaSection />
+      <MissionaryGreeting />
       <RecentActivities />
       <Vision />
       <SupportCTA />
