@@ -1,60 +1,7 @@
 import Link from 'next/link'
-import { Heart, Globe, Camera, ChevronRight, Award, Users, MapPin } from 'lucide-react'
-
-/* ── 히어로 섹션 ─────────────────────────────── */
-function Hero() {
-  return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-amber-900 via-amber-800 to-stone-900">
-      {/* 배경 패턴 */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-10 w-64 h-64 border-2 border-amber-300 rounded-full" />
-        <div className="absolute top-40 left-20 w-40 h-40 border border-amber-300 rounded-full" />
-        <div className="absolute bottom-20 right-10 w-80 h-80 border-2 border-amber-300 rounded-full" />
-        <div className="absolute bottom-40 right-20 w-48 h-48 border border-amber-300 rounded-full" />
-      </div>
-
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-2 bg-amber-600/30 border border-amber-500/50 text-amber-200 text-sm px-4 py-1.5 rounded-full mb-8">
-          <Award size={14} />
-          1988 서울 올림픽 탁구 금메달리스트
-        </div>
-
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-tight">
-          탁구로 세상을 품고,<br />
-          <span className="text-amber-400">복음으로 열방을 섬깁니다</span>
-        </h1>
-
-        <p className="text-lg md:text-xl text-stone-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-          메달을 넘어 더 큰 사명으로 —<br />
-          양영자 선교사와 함께하는 탁구 선교의 여정에 동참하세요.
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            href="https://ihappynanum.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-white font-bold px-8 py-4 rounded-full transition-all duration-200 shadow-lg hover:-translate-y-0.5 text-lg"
-          >
-            <Heart size={18} />
-            선교 후원하기
-          </Link>
-          <Link
-            href="/about"
-            className="inline-flex items-center justify-center gap-2 border-2 border-white/40 hover:border-white text-white font-semibold px-8 py-4 rounded-full transition-all duration-200 hover:bg-white/10 text-lg"
-          >
-            선교사 소개
-            <ChevronRight size={18} />
-          </Link>
-        </div>
-      </div>
-
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-amber-400/60">
-        <ChevronRight size={28} className="rotate-90" />
-      </div>
-    </section>
-  )
-}
+import { Heart, Globe, Camera, ChevronRight, Users, MapPin, Award } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import HeroSlideshow from '@/components/HeroSlideshow'
 
 /* ── 임팩트 숫자 섹션 ─────────────────────────── */
 function ImpactStats() {
@@ -305,10 +252,16 @@ function SupportCTA() {
   )
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { data: heroItems } = await supabase
+    .from('hero_media')
+    .select('id, title, media_url, media_type, display_order')
+    .eq('active', true)
+    .order('display_order', { ascending: true })
+
   return (
     <>
-      <Hero />
+      <HeroSlideshow items={heroItems ?? []} />
       <ImpactStats />
       <Story />
       <RecentActivities />
