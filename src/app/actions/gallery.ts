@@ -1,6 +1,8 @@
 'use server'
 
+import { cookies } from 'next/headers'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createAdminClient } from '@/lib/supabase-admin'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -33,4 +35,15 @@ export async function saveGalleryItemsAction(items: GalleryItem[]) {
 
   revalidatePath('/gallery')
   redirect('/gallery')
+}
+
+export async function deleteGalleryItemAction(id: number) {
+  const cookieStore = await cookies()
+  if (cookieStore.get('yttm_admin')?.value !== '1') throw new Error('Unauthorized')
+
+  const supabase = createAdminClient()
+  const { error } = await supabase.from('gallery').delete().eq('id', id)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/gallery')
 }

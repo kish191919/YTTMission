@@ -1,9 +1,15 @@
 'use server'
 
+import { cookies } from 'next/headers'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createAdminClient } from '@/lib/supabase-admin'
 import { revalidatePath } from 'next/cache'
 
-async function requireAuth() {
+async function requireAdminOrAuth() {
+  const cookieStore = await cookies()
+  if (cookieStore.get('yttm_admin')?.value === '1') {
+    return createAdminClient()
+  }
   const supabase = await createSupabaseServerClient()
   const {
     data: { user },
@@ -18,7 +24,7 @@ export async function saveHeroMedia(
   mediaType: 'image' | 'video',
   title: string
 ) {
-  const supabase = await requireAuth()
+  const supabase = await requireAdminOrAuth()
 
   const { data: last } = await supabase
     .from('hero_media')
@@ -45,7 +51,7 @@ export async function saveHeroMedia(
 }
 
 export async function deleteHeroMedia(id: number, storagePath: string) {
-  const supabase = await requireAuth()
+  const supabase = await requireAdminOrAuth()
 
   if (storagePath) {
     await supabase.storage.from('hero-media').remove([storagePath])
@@ -59,7 +65,7 @@ export async function deleteHeroMedia(id: number, storagePath: string) {
 }
 
 export async function toggleHeroMedia(id: number, active: boolean) {
-  const supabase = await requireAuth()
+  const supabase = await requireAdminOrAuth()
 
   const { error } = await supabase
     .from('hero_media')
@@ -73,9 +79,8 @@ export async function toggleHeroMedia(id: number, active: boolean) {
 }
 
 export async function reorderHeroMedia(id: number, direction: 'up' | 'down') {
-  const supabase = await requireAuth()
+  const supabase = await requireAdminOrAuth()
 
-  // 현재 항목 조회
   const { data: current } = await supabase
     .from('hero_media')
     .select('id, display_order')
@@ -84,7 +89,6 @@ export async function reorderHeroMedia(id: number, direction: 'up' | 'down') {
 
   if (!current) return
 
-  // 인접 항목 조회 (위/아래)
   const { data: neighbor } = await supabase
     .from('hero_media')
     .select('id, display_order')
@@ -93,7 +97,6 @@ export async function reorderHeroMedia(id: number, direction: 'up' | 'down') {
 
   if (!neighbor) return
 
-  // display_order 교환
   const { error: e1 } = await supabase
     .from('hero_media')
     .update({ display_order: neighbor.display_order })

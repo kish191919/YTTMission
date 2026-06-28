@@ -1,6 +1,5 @@
 'use client'
 
-import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
@@ -33,51 +32,37 @@ export default function HeroAdminClient({ items }: Props) {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [title, setTitle] = useState('')
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null)
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
-
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
 
     setUploadError(null)
-    setUploadProgress(0)
+    setUploadProgress('업로드 중...')
 
     const isVideo = file.type.startsWith('video/')
-    const ext = file.name.split('.').pop()
-    const storagePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
-    // 클라이언트에서 Supabase Storage로 직접 업로드 (Next.js 서버 미경유)
-    const { data, error } = await supabase.storage
-      .from('hero-media')
-      .upload(storagePath, file, {
-        upsert: false,
-        // @ts-expect-error — onUploadProgress는 런타임에 지원되나 타입 정의 없음
-        onUploadProgress: (progress: { loaded: number; total: number }) => {
-          setUploadProgress(Math.round((progress.loaded / progress.total) * 100))
-        },
-      })
+    const formData = new FormData()
+    formData.append('file', file)
 
-    if (error) {
-      setUploadError(`업로드 실패: ${error.message}`)
+    const res = await fetch('/api/admin/upload', { method: 'POST', body: formData })
+    const json = await res.json()
+
+    if (!res.ok) {
+      setUploadError(`업로드 실패: ${json.error ?? res.statusText}`)
       setUploadProgress(null)
       return
     }
 
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from('hero-media').getPublicUrl(data.path)
+    setUploadProgress('저장 중...')
 
     startTransition(async () => {
       await saveHeroMedia(
-        publicUrl,
-        data.path,
+        json.publicUrl,
+        json.storagePath,
         isVideo ? 'video' : 'image',
         title || file.name
       )
@@ -135,24 +120,9 @@ export default function HeroAdminClient({ items }: Props) {
           </div>
 
           {uploadProgress !== null && (
-            <div>
-              <div className="flex justify-between text-xs text-stone-500 mb-1">
-                <span>업로드 중...</span>
-                <span>{uploadProgress}%</span>
-              </div>
-              <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-amber-500 transition-all duration-200"
-                  style={{ width: `${uploadProgress}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {isPending && uploadProgress === null && (
             <div className="flex items-center gap-2 text-sm text-amber-700">
               <Loader2 size={15} className="animate-spin" />
-              저장 중...
+              {uploadProgress}
             </div>
           )}
 
@@ -196,7 +166,6 @@ export default function HeroAdminClient({ items }: Props) {
                       <Film size={22} className="text-white opacity-70" />
                     </div>
                   )}
-                  {/* 타입 뱃지 */}
                   <span className="absolute top-1 left-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-black/60 text-white">
                     {item.media_type === 'video' ? '동영상' : '이미지'}
                   </span>
@@ -214,7 +183,6 @@ export default function HeroAdminClient({ items }: Props) {
 
                 {/* 컨트롤 */}
                 <div className="flex items-center gap-1 shrink-0">
-                  {/* 위/아래 */}
                   <button
                     onClick={() => handleAction(() => reorderHeroMedia(item.id, 'up'))}
                     disabled={index === 0 || isPending}
@@ -232,7 +200,6 @@ export default function HeroAdminClient({ items }: Props) {
                     <ChevronDown size={16} />
                   </button>
 
-                  {/* 표시/숨김 */}
                   <button
                     onClick={() => handleAction(() => toggleHeroMedia(item.id, !item.active))}
                     disabled={isPending}
@@ -246,7 +213,6 @@ export default function HeroAdminClient({ items }: Props) {
                     {item.active ? <Eye size={16} /> : <EyeOff size={16} />}
                   </button>
 
-                  {/* 삭제 */}
                   <button
                     onClick={() => {
                       if (!confirm(`"${item.title || '이 항목'}"을 삭제하시겠습니까?`)) return

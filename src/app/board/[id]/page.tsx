@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Calendar, Tag, User } from 'lucide-react'
+import { ArrowLeft, Calendar, Tag, User, Pencil, Trash2 } from 'lucide-react'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { isAdmin } from '@/lib/admin'
 import { formatDate } from '@/lib/utils'
+import PostAdminControls from '@/components/board/PostAdminControls'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,12 +34,15 @@ export default async function BoardPostPage({
   const { id } = await params
   const supabase = await createSupabaseServerClient()
 
-  const { data: post } = await supabase
-    .from('posts')
-    .select('id, title, content, category, images, created_at, user_id')
-    .eq('id', Number(id))
-    .eq('published', true)
-    .maybeSingle()
+  const [{ data: post }, admin] = await Promise.all([
+    supabase
+      .from('posts')
+      .select('id, title, content, category, images, created_at, user_id')
+      .eq('id', Number(id))
+      .eq('published', true)
+      .maybeSingle(),
+    isAdmin(),
+  ])
 
   if (!post) notFound()
 
@@ -54,13 +59,18 @@ export default async function BoardPostPage({
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#fdfaf6' }}>
       <div className="max-w-3xl mx-auto px-4 py-10">
-        <Link
-          href="/board"
-          className="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-amber-700 mb-8 transition-colors"
-        >
-          <ArrowLeft size={15} />
-          게시판으로 돌아가기
-        </Link>
+        <div className="flex items-center justify-between mb-8">
+          <Link
+            href="/board"
+            className="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-amber-700 transition-colors"
+          >
+            <ArrowLeft size={15} />
+            게시판으로 돌아가기
+          </Link>
+          {admin && (
+            <PostAdminControls postId={post.id} />
+          )}
+        </div>
 
         <article className="bg-white rounded-2xl shadow-sm border border-stone-100 p-8">
           {/* 메타 */}

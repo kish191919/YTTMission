@@ -3,7 +3,9 @@ import Link from 'next/link'
 import { FileText, ChevronRight, Calendar, PenSquare } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { isAdmin } from '@/lib/admin'
 import { formatDate } from '@/lib/utils'
+import PostAdminControls from '@/components/board/PostAdminControls'
 
 export const metadata: Metadata = {
   title: '게시판',
@@ -38,33 +40,40 @@ type Post = {
   published: boolean
 }
 
-function PostCard({ post }: { post: Post }) {
+function PostCard({ post, admin }: { post: Post; admin: boolean }) {
   const preview = post.content.replace(/<[^>]*>/g, '').slice(0, 120)
 
   return (
-    <Link
-      href={`/board/${post.id}`}
-      className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-stone-100 group block"
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-semibold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
-              {post.category}
-            </span>
-            <span className="text-xs text-stone-400 flex items-center gap-1">
-              <Calendar size={11} />
-              {formatDate(post.created_at)}
-            </span>
+    <div className="bg-white rounded-2xl shadow-sm border border-stone-100 group">
+      <Link
+        href={`/board/${post.id}`}
+        className="block p-6 hover:bg-stone-50 transition-colors rounded-2xl"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-semibold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                {post.category}
+              </span>
+              <span className="text-xs text-stone-400 flex items-center gap-1">
+                <Calendar size={11} />
+                {formatDate(post.created_at)}
+              </span>
+            </div>
+            <h3 className="font-bold text-stone-800 group-hover:text-amber-700 transition-colors mb-1 truncate">
+              {post.title}
+            </h3>
+            <p className="text-sm text-stone-500 line-clamp-2 leading-relaxed">{preview}</p>
           </div>
-          <h3 className="font-bold text-stone-800 group-hover:text-amber-700 transition-colors mb-1 truncate">
-            {post.title}
-          </h3>
-          <p className="text-sm text-stone-500 line-clamp-2 leading-relaxed">{preview}</p>
+          <ChevronRight size={18} className="text-stone-300 group-hover:text-amber-500 flex-shrink-0 mt-1 transition-colors" />
         </div>
-        <ChevronRight size={18} className="text-stone-300 group-hover:text-amber-500 flex-shrink-0 mt-1 transition-colors" />
-      </div>
-    </Link>
+      </Link>
+      {admin && (
+        <div className="px-6 pb-4 flex justify-end">
+          <PostAdminControls postId={post.id} />
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -74,7 +83,10 @@ export default async function BoardPage({
   searchParams: Promise<{ category?: string }>
 }) {
   const { category } = await searchParams
-  const posts = await getPosts(category)
+  const [posts, admin] = await Promise.all([
+    getPosts(category),
+    isAdmin(),
+  ])
 
   const supabaseServer = await createSupabaseServerClient()
   const {
@@ -139,7 +151,7 @@ export default async function BoardPage({
         ) : (
           <div className="space-y-3">
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <PostCard key={post.id} post={post} admin={admin} />
             ))}
           </div>
         )}

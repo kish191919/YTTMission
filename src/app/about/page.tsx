@@ -34,7 +34,7 @@ function GreetingSection() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           {/* 사진 */}
-          <div className="sticky top-24">
+          <div className="sticky top-24 self-start">
             <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl">
               <Image
                 src="/images/yttm.jpeg"

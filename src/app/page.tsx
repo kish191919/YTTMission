@@ -107,33 +107,10 @@ function MissionaryGreeting() {
 }
 
 /* ── 최근 선교 활동 ───────────────────────────── */
-function RecentActivities() {
-  const activities = [
-    {
-      year: '2025',
-      title: '2025 선교 활동',
-      description: '새해를 맞아 시작된 탁구 선교의 새로운 장. 지역 사회와 함께하는 선교의 현장을 만나보세요.',
-      tag: '진행중',
-      tagColor: 'bg-green-100 text-green-700',
-      href: '/gallery?album=2025',
-    },
-    {
-      year: '2024',
-      title: '2024 몽골 선교',
-      description: '몽골의 광활한 초원 위에서 탁구공이 전한 복음의 이야기. 현지 청소년들과 함께한 소중한 시간.',
-      tag: '몽골',
-      tagColor: 'bg-blue-100 text-blue-700',
-      href: '/gallery?album=2024-mongolia',
-    },
-    {
-      year: '2024',
-      title: '2024 선교 기록',
-      description: '한 해를 돌아보며 정리한 선교 사역의 열매들. 기도와 후원으로 함께해주신 모든 분께 감사드립니다.',
-      tag: '아카이브',
-      tagColor: 'bg-amber-100 text-amber-700',
-      href: '/gallery?album=2024',
-    },
-  ]
+type RecentAlbum = { name: string; thumbnail: string | null; mediaType: string }
+
+function RecentActivities({ albums }: { albums: RecentAlbum[] }) {
+  if (albums.length === 0) return null
 
   return (
     <section className="py-20 bg-white">
@@ -149,32 +126,48 @@ function RecentActivities() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {activities.map((activity) => (
-            <Link
-              key={activity.title}
-              href={activity.href}
-              className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden group border border-stone-100"
-            >
-              <div className="aspect-video bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                <Camera size={40} className="text-amber-400 group-hover:scale-110 transition-transform duration-200" />
-              </div>
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-stone-400">{activity.year}</span>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${activity.tagColor}`}>
-                    {activity.tag}
-                  </span>
+          {albums.map((album) => {
+            const year = album.name.match(/^\d{4}/)?.[0] ?? ''
+            return (
+              <Link
+                key={album.name}
+                href={`/gallery?album=${encodeURIComponent(album.name)}`}
+                className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden group border border-stone-100"
+              >
+                <div className="aspect-video bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center overflow-hidden">
+                  {album.thumbnail ? (
+                    album.mediaType === 'video' ? (
+                      <video
+                        src={album.thumbnail}
+                        className="w-full h-full object-cover"
+                        muted
+                        playsInline
+                        preload="metadata"
+                      />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={album.thumbnail}
+                        alt={album.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    )
+                  ) : (
+                    <Camera size={40} className="text-amber-400 group-hover:scale-110 transition-transform duration-200" />
+                  )}
                 </div>
-                <h3 className="text-lg font-bold text-stone-800 mb-2 group-hover:text-amber-700 transition-colors">
-                  {activity.title}
-                </h3>
-                <p className="text-sm text-stone-500 leading-relaxed">{activity.description}</p>
-                <div className="mt-4 flex items-center gap-1 text-amber-600 text-sm font-medium">
-                  사진 보기 <ChevronRight size={14} />
+                <div className="p-5">
+                  {year && <span className="text-xs font-bold text-stone-400 block mb-2">{year}</span>}
+                  <h3 className="text-lg font-bold text-stone-800 mb-2 group-hover:text-amber-700 transition-colors">
+                    {album.name}
+                  </h3>
+                  <div className="mt-4 flex items-center gap-1 text-amber-600 text-sm font-medium">
+                    사진 보기 <ChevronRight size={14} />
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            )
+          })}
         </div>
 
         <div className="text-center mt-10">
@@ -269,17 +262,33 @@ function SupportCTA() {
 }
 
 export default async function HomePage() {
-  const { data: heroItems } = await supabase
-    .from('hero_media')
-    .select('id, title, media_url, media_type, display_order')
-    .eq('active', true)
-    .order('display_order', { ascending: true })
+  const [{ data: heroItems }, { data: galleryRows }] = await Promise.all([
+    supabase
+      .from('hero_media')
+      .select('id, title, media_url, media_type, display_order')
+      .eq('active', true)
+      .order('display_order', { ascending: true }),
+    supabase
+      .from('gallery')
+      .select('album, image_url, media_type')
+      .order('created_at', { ascending: false }),
+  ])
+
+  const albumMap = new Map<string, { thumbnail: string; mediaType: string }>()
+  for (const row of galleryRows ?? []) {
+    if (row.album && !albumMap.has(row.album)) {
+      albumMap.set(row.album, { thumbnail: row.image_url, mediaType: row.media_type ?? 'image' })
+    }
+  }
+  const recentAlbums = Array.from(albumMap.entries())
+    .slice(0, 3)
+    .map(([name, meta]) => ({ name, ...meta }))
 
   return (
     <>
       <HeroSlideshow items={heroItems ?? []} />
       <MissionaryGreeting />
-      <RecentActivities />
+      <RecentActivities albums={recentAlbums} />
       <SupportCTA />
     </>
   )
