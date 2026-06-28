@@ -13,5 +13,5 @@ export default async function BoardWritePage() {
 
   if (!user) redirect('/login?next=/board/write')
 
-  return <BoardWriteClient />
+  return <BoardWriteClient userId={user.id} />
 }

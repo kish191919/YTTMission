@@ -34,7 +34,7 @@ export default async function BoardPostPage({
 
   const { data: post } = await supabase
     .from('posts')
-    .select('id, title, content, category, created_at, user_id')
+    .select('id, title, content, category, images, created_at, user_id')
     .eq('id', Number(id))
     .eq('published', true)
     .maybeSingle()
@@ -86,6 +86,24 @@ export default async function BoardPostPage({
           <div className="prose prose-stone max-w-none text-stone-700 leading-relaxed whitespace-pre-wrap">
             {post.content}
           </div>
+
+          {/* 첨부 사진 */}
+          {post.images && post.images.length > 0 && (
+            <div className="mt-8 pt-6 border-t border-stone-100">
+              <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">첨부 사진</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {post.images.map((url: string, i: number) => (
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block">
+                    <img
+                      src={url}
+                      alt=""
+                      className="w-full aspect-square object-cover rounded-xl hover:opacity-90 transition-opacity"
+                    />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </article>
       </div>
     </div>

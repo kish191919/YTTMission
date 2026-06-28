@@ -48,9 +48,8 @@ export default function SignupPage() {
       },
     })
 
-    setLoading(false)
-
     if (error) {
+      setLoading(false)
       if (error.message.includes('already registered')) {
         setError('이미 가입된 이메일입니다.')
       } else {
@@ -59,6 +58,9 @@ export default function SignupPage() {
       return
     }
 
+    // signUp()은 성공 시 세션을 자동 생성하므로, 이메일 인증 전에 로그인되지 않도록 즉시 로그아웃
+    await supabase.auth.signOut()
+    setLoading(false)
     setSuccess(true)
   }
 

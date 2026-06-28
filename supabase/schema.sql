@@ -148,7 +148,8 @@ create or replace trigger on_auth_user_created
 
 -- B. posts / gallery 에 회원 연결 컬럼 추가
 alter table public.posts
-  add column if not exists user_id uuid references auth.users(id) on delete set null;
+  add column if not exists user_id uuid references auth.users(id) on delete set null,
+  add column if not exists images text[] not null default '{}';
 
 alter table public.gallery
   add column if not exists user_id uuid references auth.users(id) on delete set null,
