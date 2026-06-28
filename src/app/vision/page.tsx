@@ -131,37 +131,29 @@ export default function VisionPage() {
       </section>
 
       {/* 성경 말씀 인용 */}
-      <section className="relative py-36 overflow-hidden mt-8">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/vision-seedling.jpg"
-            alt="겨자씨"
-            fill
-            className="object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-white/60" />
-        </div>
-        <div className="relative max-w-2xl mx-auto px-6 text-center">
-          <span
-            className="block text-8xl leading-none font-serif text-left select-none"
-            style={{ color: MAROON }}
-          >
-            {'“'}
-          </span>
-          <p className="text-stone-800 text-lg md:text-xl leading-relaxed -mt-4">
-            (하나님의 나라는) 마치 겨자씨와 같다.<br />
-            어떤 사람이 그것을 가져다가 자기 정원에 심었더니,<br />
-            자라서 나무가 되어, 공중의 새들이 그 가지에 깃들었다.
-          </p>
-          <p className="mt-4 text-sm text-stone-500">
-            (누가복음 13:19 표준새번역)
-          </p>
-          <span
-            className="block text-8xl leading-none font-serif text-right select-none"
-            style={{ color: MAROON }}
-          >
-            {'”'}
-          </span>
+      <section className="py-16 mt-8 bg-[#faf8f5]">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="relative rounded-2xl overflow-hidden shadow-lg pt-12 pb-20 px-10">
+            <div className="absolute inset-0">
+              <Image
+                src="/images/vision-seedling.jpg"
+                alt="겨자씨"
+                fill
+                className="object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-white/65" />
+            </div>
+            <div className="relative ml-auto max-w-md text-right">
+              <p className="text-stone-800 text-base md:text-lg leading-relaxed">
+                (하나님의 나라는) 마치 겨자씨와 같다.{" "}
+                어떤 사람이 그것을 가져다가 자기 정원에 심었더니,{" "}
+                자라서 나무가 되어, 공중의 새들이 그 가지에 깃들었다.
+              </p>
+              <p className="mt-3 text-xs text-stone-500">
+                (누가복음 13:19 표준새번역)
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     </main>

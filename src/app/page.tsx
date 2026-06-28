@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart, Camera, ChevronRight, Award } from 'lucide-react'
+import { Heart, Camera, ChevronRight, Award, Settings } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { isAdmin } from '@/lib/admin'
 import HeroSlideshow from '@/components/HeroSlideshow'
 
 /* ── 히어로 CTA 섹션 ─────────────────────────── */
@@ -262,7 +263,7 @@ function SupportCTA() {
 }
 
 export default async function HomePage() {
-  const [{ data: heroItems }, { data: galleryRows }] = await Promise.all([
+  const [{ data: heroItems }, { data: galleryRows }, admin] = await Promise.all([
     supabase
       .from('hero_media')
       .select('id, title, media_url, media_type, display_order')
@@ -272,6 +273,7 @@ export default async function HomePage() {
       .from('gallery')
       .select('album, image_url, media_type')
       .order('created_at', { ascending: false }),
+    isAdmin(),
   ])
 
   const albumMap = new Map<string, { thumbnail: string; mediaType: string }>()
@@ -286,7 +288,18 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSlideshow items={heroItems ?? []} />
+      <div className="relative">
+        <HeroSlideshow items={heroItems ?? []} />
+        {admin && (
+          <Link
+            href="/admin/hero"
+            className="absolute bottom-4 right-4 z-20 inline-flex items-center gap-1.5 bg-black/50 hover:bg-black/70 text-white text-xs font-semibold px-3 py-2 rounded-full backdrop-blur-sm transition-colors"
+          >
+            <Settings size={13} />
+            슬라이드 관리
+          </Link>
+        )}
+      </div>
       <MissionaryGreeting />
       <RecentActivities albums={recentAlbums} />
       <SupportCTA />

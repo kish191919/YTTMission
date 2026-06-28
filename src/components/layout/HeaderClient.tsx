@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
-import { Menu, X, Heart, LogIn, LogOut, User } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Menu, X, Heart, LogIn, LogOut, User, ShieldCheck } from 'lucide-react'
 import { signOutAction } from '@/app/actions/auth'
+import { adminSignOutAction } from '@/app/actions/admin-auth'
 
 type NavItem = {
   label: string
@@ -23,14 +24,31 @@ const navItems: NavItem[] = [
 type Props = {
   user: { id: string; email: string } | null
   displayName: string | null
+  isAdmin?: boolean
 }
 
-export default function HeaderClient({ user, displayName }: Props) {
+export default function HeaderClient({ user, displayName, isAdmin }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null)
+  const headerRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (!mobileOpen) return
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
+        setMobileOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
+  }, [mobileOpen])
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-amber-100 shadow-sm">
+    <header ref={headerRef} className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-amber-100 shadow-sm">
       <div className="max-w-6xl mx-auto px-4 h-[72px] flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
@@ -102,7 +120,27 @@ export default function HeaderClient({ user, displayName }: Props) {
             후원하기
           </Link>
 
-          {user ? (
+          {/* 어드민 상태 */}
+          {isAdmin ? (
+            <div className="hidden md:flex items-center gap-2">
+              <Link
+                href="/admin/hero"
+                className="flex items-center gap-1.5 text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full hover:bg-amber-100 transition-colors"
+              >
+                <ShieldCheck size={13} />
+                관리자
+              </Link>
+              <form action={adminSignOutAction}>
+                <button
+                  type="submit"
+                  className="flex items-center gap-1 text-sm text-stone-500 hover:text-red-600 px-3 py-1.5 rounded-full hover:bg-red-50 transition-colors"
+                >
+                  <LogOut size={13} />
+                  로그아웃
+                </button>
+              </form>
+            </div>
+          ) : user ? (
             <div className="hidden md:flex items-center gap-2">
               <span className="flex items-center gap-1.5 text-sm text-stone-600 px-3 py-1.5 rounded-full bg-stone-50 border border-stone-200">
                 <User size={13} />
@@ -140,56 +178,79 @@ export default function HeaderClient({ user, displayName }: Props) {
 
       {/* Mobile Nav */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-amber-100 bg-white py-3">
-          {navItems.map((item) => (
-            <div key={item.href}>
-              <Link
-                href={item.href}
-                className="block px-6 py-2.5 text-sm font-medium text-stone-700 hover:text-amber-700 hover:bg-amber-50 transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                {item.label}
-              </Link>
-              {item.children?.map((child) => (
+        <div className="md:hidden border-t border-amber-100 bg-white shadow-lg">
+          <nav className="divide-y divide-stone-100">
+            {navItems.map((item) => (
+              <div key={item.href}>
                 <Link
-                  key={child.href}
-                  href={child.href}
-                  className="block px-10 py-2 text-sm text-stone-500 hover:text-amber-700 hover:bg-amber-50 transition-colors"
+                  href={item.href}
+                  className="flex items-center px-6 py-4 text-base font-semibold text-stone-700 hover:text-amber-700 hover:bg-amber-50 transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
-                  {child.label}
+                  {item.label}
                 </Link>
-              ))}
-            </div>
-          ))}
-          <div className="px-6 pt-3 pb-1 border-t border-amber-50 mt-2 space-y-2">
+                {item.children?.map((child) => (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    className="flex items-center px-10 py-3 text-sm text-stone-500 hover:text-amber-700 hover:bg-amber-50 transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {child.label}
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </nav>
+          <div className="px-6 py-4 border-t border-amber-100 space-y-3">
             <Link
               href="https://www.ihappynanum.com/Nanum/B/4ZOM149MCQ"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1.5 bg-amber-600 text-white text-sm font-semibold px-4 py-2.5 rounded-full"
+              className="flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-base font-semibold px-4 py-3 rounded-full transition-colors"
               onClick={() => setMobileOpen(false)}
             >
-              <Heart size={14} />
+              <Heart size={16} />
               후원하기
             </Link>
-            {user ? (
+
+            {isAdmin ? (
+              <>
+                <Link
+                  href="/admin/hero"
+                  className="flex items-center justify-center gap-2 border border-amber-200 text-amber-700 text-base font-semibold px-4 py-3 rounded-full hover:bg-amber-50 transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <ShieldCheck size={16} />
+                  관리자 페이지
+                </Link>
+                <form action={adminSignOutAction}>
+                  <button
+                    type="submit"
+                    className="w-full flex items-center justify-center gap-2 border border-stone-200 text-stone-600 text-base font-medium px-4 py-3 rounded-full hover:bg-stone-50 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    로그아웃
+                  </button>
+                </form>
+              </>
+            ) : user ? (
               <form action={signOutAction}>
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-1.5 border border-stone-200 text-stone-600 text-sm font-medium px-4 py-2.5 rounded-full hover:bg-stone-50 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 border border-stone-200 text-stone-600 text-base font-medium px-4 py-3 rounded-full hover:bg-stone-50 transition-colors"
                 >
-                  <LogOut size={14} />
+                  <LogOut size={16} />
                   로그아웃 ({displayName ?? user.email})
                 </button>
               </form>
             ) : (
               <Link
                 href="/login"
-                className="flex items-center justify-center gap-1.5 border border-amber-200 text-amber-700 text-sm font-semibold px-4 py-2.5 rounded-full hover:bg-amber-50 transition-colors"
+                className="flex items-center justify-center gap-2 border border-amber-200 text-amber-700 text-base font-semibold px-4 py-3 rounded-full hover:bg-amber-50 transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
-                <LogIn size={14} />
+                <LogIn size={16} />
                 로그인
               </Link>
             )}

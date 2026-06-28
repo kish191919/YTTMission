@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { isAdmin } from '@/lib/admin'
 import HeaderClient from './HeaderClient'
 
 export default async function Header() {
@@ -17,10 +18,13 @@ export default async function Header() {
     displayName = data?.display_name ?? null
   }
 
+  const admin = await isAdmin()
+
   return (
     <HeaderClient
       user={user ? { id: user.id, email: user.email! } : null}
       displayName={displayName}
+      isAdmin={admin}
     />
   )
 }

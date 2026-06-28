@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Camera, ChevronRight, Upload } from 'lucide-react'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { isAdmin } from '@/lib/admin'
+import PhotoAdminControls from '@/components/gallery/PhotoAdminControls'
 
 export const metadata: Metadata = {
   title: '갤러리',
@@ -53,7 +55,7 @@ type GalleryPhoto = {
   media_type: 'image' | 'video'
 }
 
-function PhotoGrid({ photos }: { photos: GalleryPhoto[] }) {
+function PhotoGrid({ photos, admin }: { photos: GalleryPhoto[]; admin: boolean }) {
   if (photos.length === 0) {
     return (
       <div className="text-center py-20 text-stone-400">
@@ -90,6 +92,7 @@ function PhotoGrid({ photos }: { photos: GalleryPhoto[] }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-3">
             <p className="text-white text-xs font-medium line-clamp-2">{photo.title}</p>
           </div>
+          {admin && <PhotoAdminControls photoId={photo.id} />}
         </div>
       ))}
     </div>
@@ -102,10 +105,11 @@ export default async function GalleryPage({
   searchParams: Promise<{ album?: string }>
 }) {
   const { album } = await searchParams
-  const [photos, albums, supabaseServer] = await Promise.all([
+  const [photos, albums, supabaseServer, admin] = await Promise.all([
     getGalleryPhotos(album),
     getAlbums(),
     createSupabaseServerClient(),
+    isAdmin(),
   ])
 
   const {
@@ -220,7 +224,7 @@ export default async function GalleryPage({
             <div className="mb-6">
               <h2 className="text-xl font-bold text-stone-800">{album}</h2>
             </div>
-            <PhotoGrid photos={photos} />
+            <PhotoGrid photos={photos} admin={admin} />
           </>
         )}
 
@@ -228,7 +232,7 @@ export default async function GalleryPage({
         {!album && photos.length > 0 && (
           <div>
             <h2 className="text-xl font-bold text-stone-800 mb-5">최근 사진</h2>
-            <PhotoGrid photos={photos} />
+            <PhotoGrid photos={photos} admin={admin} />
           </div>
         )}
 

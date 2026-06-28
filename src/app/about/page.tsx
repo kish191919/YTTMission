@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 /* ── 소개 히어로 ─────────────────────────────── */
 function AboutHero() {
   return (
-    <section className="bg-gradient-to-b from-amber-50 to-white py-20">
+    <section className="bg-gradient-to-b from-amber-50 to-white pt-20 pb-10">
       <div className="max-w-4xl mx-auto px-4 text-center">
         <span className="inline-block text-amber-600 font-semibold text-sm uppercase tracking-wider mb-4">
           About YTTM
@@ -30,11 +30,11 @@ function AboutHero() {
 /* ── 인사말 & 간증 ───────────────────────────── */
 function GreetingSection() {
   return (
-    <section className="py-20 bg-white">
+    <section className="pt-10 pb-20 bg-white">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="grid md:grid-cols-2 gap-16 items-start">
+        <div className="grid md:grid-cols-2 gap-16">
           {/* 사진 */}
-          <div className="sticky top-24 self-start">
+          <div className="pt-12">
             <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl">
               <Image
                 src="/images/yttm.jpeg"
