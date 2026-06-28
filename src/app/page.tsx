@@ -23,7 +23,7 @@ function HeroCtaSection() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="https://ihappynanum.com"
+            href="https://www.ihappynanum.com/Nanum/B/4ZOM149MCQ"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 rounded-full transition-all duration-200 shadow-lg hover:-translate-y-0.5 text-base"
@@ -247,7 +247,7 @@ function SupportCTA() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="https://ihappynanum.com"
+            href="https://www.ihappynanum.com/Nanum/B/4ZOM149MCQ"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold px-8 py-4 rounded-full transition-all duration-200 shadow-md hover:shadow-lg text-base"

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Heart, ChevronRight, Award, Globe, Target, Zap } from 'lucide-react'
 
@@ -19,100 +20,135 @@ function AboutHero() {
           양영자 선교사를<br />소개합니다
         </h1>
         <p className="text-lg text-stone-500 max-w-2xl mx-auto leading-relaxed">
-          올림픽 금메달의 영광에서 선교사의 사명으로 — 탁구를 통해 하나님의 사랑을 전하는
-          양영자 선교사의 이야기입니다.
+          우리를 사랑하시는 주님 안에서 인사드립니다
         </p>
       </div>
     </section>
   )
 }
 
-/* ── 선교사 이야기 ───────────────────────────── */
-function MissionaryStory() {
+/* ── 인사말 & 간증 ───────────────────────────── */
+function GreetingSection() {
   return (
     <section className="py-20 bg-white">
       <div className="max-w-6xl mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-16 items-start">
-          {/* 이미지 */}
+          {/* 사진 */}
           <div className="sticky top-24">
-            <div className="aspect-[3/4] bg-gradient-to-br from-amber-100 to-amber-300 rounded-3xl flex items-center justify-center shadow-xl">
-              <div className="text-center text-amber-800 p-8">
-                <div className="text-7xl mb-4">🏓</div>
-                <p className="font-bold text-lg">양영자 선교사</p>
-                <p className="text-sm opacity-70 mt-1">YTTM 탁구선교회 대표</p>
-              </div>
-            </div>
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="bg-amber-50 rounded-xl p-4 text-center border border-amber-100">
-                <div className="text-2xl font-black text-amber-700">1988</div>
-                <div className="text-xs text-stone-500 mt-0.5">올림픽 금메달</div>
-              </div>
-              <div className="bg-amber-50 rounded-xl p-4 text-center border border-amber-100">
-                <div className="text-2xl font-black text-amber-700">5개국+</div>
-                <div className="text-xs text-stone-500 mt-0.5">선교 방문국</div>
-              </div>
+            <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl">
+              <Image
+                src="/images/yttm.jpeg"
+                alt="양영자 선교사"
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
           </div>
 
-          {/* 이야기 */}
+          {/* 인사말 & 간증 */}
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-black text-stone-800 mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-black text-stone-800 mb-5">
+                인사말
+              </h2>
+              <div className="space-y-4 text-stone-600 leading-relaxed">
+                <p>
+                  우리를 사랑하시는 주님 안에서 인사드립니다.
+                </p>
+                <p>
+                  1988년 9월 30일. 그 날은 제가 평생 잊을 수 없는 날입니다. 그 날은 올림픽에서 제가 현정화 선수와 함께 탁구 역사상 최초의 올림픽 탁구 금메달을 딴 날입니다. 그 메달은 하루 아침에 이루어진 것이 아니었습니다. 어렸을 때에 탁구일지에 대한민국을 빛내는 국가대표선수가 되고 싶다는 꿈을 적었고, 국제대회에서 메달을 따고 싶다는 꿈을 적었습니다. 그러나, 그 꿈을 이루는 데에는 고된 훈련이 따랐고, 몸은 몸대로 너무 아팠고, 탁구를 그만둬야 하나라는 생각이 들 정도로 힘든 시간들도 있었습니다. 그러나 결국 제가 꿈꿨던 국가대표가 되었고, 국제대회에서도 각종 메달들을 땄습니다. 그리고, 온 국민의 응원과 성원으로 올림픽 금메달도 땄습니다.
+                </p>
+                <p>
+                  1983년 여름의 어느 날을 저는 또 잊을 수가 없습니다. 그 날은 제가 예수님을 저의 구주로 영접한 날입니다. 그 날 저는 저같은 죄인을 위해 예수그리스도께서 십자가에서 못박혀 죽고 다시 사셨다는 사실을 접하고 한없이 울었습니다. 그 이후 제가 국가대표가 되어 국제대회에서 메달들을 따기까지 하나님은 저와 함께 하셨고, 때마다 성경말씀으로 인도하셨고, 깨닫게 하셨습니다. 탁구채조차 들 수 없었던 저의 팔을 치유해 주셨고, 병상에 누워 간절히 간구하던 저를 탁구대회에 설 수 있게 해 주셨습니다. 하나님은 그렇게 제가 금메달을 딸 수 있게 해 주셨습니다.
+                </p>
+                <p>
+                  저는 고백합니다. 나의 나 된 것은 오직 주님의 은혜라고! 하나님은 제가 탁구에서 은퇴한 후 아주 심한 우울증에 빠졌을 때에도 저를 건져주셨습니다. 그리고, 14년간 몽골선교사로 보내주셔서 그 곳의 영혼들을 위해 섬기는 특권을 주셨습니다. 이제는 가는 곳마다 서는 곳마다 복음을 전하도록 인도하고 계십니다. 저는 또 고백합니다. 금메달이 귀하지만 하나님을 믿는 믿음은 더욱 귀하다고!
+                </p>
+                <p>
+                  YTTM은 탁구를 통해 섬기며 복음을 전합니다. 기도해 주시고, 동참해 주십시오. 이 땅에 있는 모든 이들이 예수그리스도를 구주로 고백하는 날이 오기를 바랍니다.
+                </p>
+                <p>
+                  감사합니다.
+                </p>
+                <p className="text-right font-semibold text-stone-700 pt-2">
+                  대표&nbsp;&nbsp;&nbsp;양 영 자
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ── 선수의 길 / 선교사의 길 ─────────────────── */
+function CareerSection() {
+  const athletePath = [
+    { year: '1983', desc: '동경세계탁구선수권대회 여자단식 은메달' },
+    { year: '1986', desc: '서울아시안게임 여자단체전탁구 금메달' },
+    { year: '1987', desc: '뉴델리세계탁구선수권대회 여자단식 은메달, 여자복식 금메달' },
+    { year: '1988', desc: '서울올림픽 여자복식탁구 금메달' },
+    { year: '1988', desc: '대한민국 체육훈장 청룡장 수상' },
+  ]
+
+  const missionaryPath = [
+    { desc: '양영자탁구선교회 대표' },
+    { desc: 'WEC 국제선교회 선교사' },
+    { desc: '세계성시화운동본부 홍보대사' },
+    { desc: '사랑의교회 파송 몽골선교사 역임' },
+  ]
+
+  return (
+    <section className="py-20" style={{ backgroundColor: '#faf5eb' }}>
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="text-center mb-14">
+          <span className="inline-block text-amber-600 font-semibold text-sm uppercase tracking-wider mb-3">
+            Biography
+          </span>
+          <h2 className="text-3xl md:text-4xl font-black text-stone-800">
+            양영자 선교사의 두 길
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* 선수의 길 */}
+          <div className="bg-white rounded-3xl p-8 shadow-sm border border-amber-50">
+            <div className="flex items-center gap-3 mb-7">
+              <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Award size={22} className="text-amber-600" />
-                올림픽의 영광
-              </h2>
-              <div className="space-y-3 text-stone-600 leading-relaxed">
-                <p>
-                  어린 시절부터 탁구를 시작한 양영자는 누구보다 간절한 마음으로 국가대표의 꿈을
-                  키워왔습니다. 새벽부터 밤까지 이어지는 고된 훈련, 수없이 반복된 연습 끝에
-                  마침내 국가대표 선수의 자리에 올랐습니다.
-                </p>
-                <p>
-                  1988년 9월 30일, 서울 올림픽 탁구 경기장. 현정화 선수와 함께 복식 경기에서
-                  올림픽 탁구 역사상 최초의 금메달을 획득했습니다. 대한민국 전체가 함께
-                  울고 웃었던 그 순간은 영원히 역사에 기록되었습니다.
-                </p>
               </div>
+              <h3 className="text-xl font-black text-stone-800">선수의 길</h3>
             </div>
+            <ul className="space-y-4">
+              {athletePath.map((item, i) => (
+                <li key={i} className="flex items-start gap-4">
+                  <span className="text-sm font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg flex-shrink-0 mt-0.5">
+                    {item.year}
+                  </span>
+                  <span className="text-stone-600 leading-relaxed">{item.desc}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            <div>
-              <h2 className="text-2xl font-black text-stone-800 mb-4 flex items-center gap-2">
+          {/* 선교사의 길 */}
+          <div className="bg-white rounded-3xl p-8 shadow-sm border border-amber-50">
+            <div className="flex items-center gap-3 mb-7">
+              <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Globe size={22} className="text-amber-600" />
-                새로운 부르심
-              </h2>
-              <div className="space-y-3 text-stone-600 leading-relaxed">
-                <p>
-                  선수 생활을 마친 후, 양영자는 더 큰 부르심을 경험했습니다. 탁구 코치와
-                  지도자로 활동하면서 하나님의 인도하심 가운데 선교사로서의 사명을 깨달았습니다.
-                </p>
-                <p>
-                  "탁구는 국경이 없습니다. 언어가 통하지 않아도, 문화가 달라도, 탁구대 앞에서는
-                  모두가 하나가 됩니다. 저는 그 탁구를 통해 복음을 전하고 싶었습니다."
-                </p>
-                <p>
-                  이렇게 시작된 탁구 선교의 여정은 몽골, 중국, 아시아 각지로 이어졌고,
-                  오늘도 계속되고 있습니다.
-                </p>
               </div>
+              <h3 className="text-xl font-black text-stone-800">선교사의 길</h3>
             </div>
-
-            <div>
-              <h2 className="text-2xl font-black text-stone-800 mb-4 flex items-center gap-2">
-                <Heart size={22} className="text-amber-600" />
-                YTTM의 시작
-              </h2>
-              <div className="space-y-3 text-stone-600 leading-relaxed">
-                <p>
-                  YTTM(양영자 탁구선교회)은 탁구를 통한 복음 전파라는 비전 아래 설립되었습니다.
-                  스포츠라는 공통 언어를 통해 복음을 접하기 어려운 지역과 사람들에게
-                  다가가는 독특한 선교 방식을 추구합니다.
-                </p>
-                <p>
-                  매년 국내외 선교 여행을 통해 탁구 클리닉을 운영하고, 현지 청소년들과
-                  교류하며 자연스럽게 복음을 전합니다.
-                </p>
-              </div>
-            </div>
+            <ul className="space-y-4">
+              {missionaryPath.map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-2" />
+                  <span className="text-stone-600 leading-relaxed">{item.desc}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
@@ -146,7 +182,7 @@ function VisionSection() {
   ]
 
   return (
-    <section id="vision" className="py-20" style={{ backgroundColor: '#faf5eb' }}>
+    <section id="vision" className="py-20 bg-white">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-14">
           <span className="inline-block text-amber-600 font-semibold text-sm uppercase tracking-wider mb-3">
@@ -191,7 +227,7 @@ function AboutCTA() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="https://ihappynanum.com"
+            href="https://www.ihappynanum.com/Nanum/B/4ZOM149MCQ"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 bg-white text-amber-700 font-bold px-8 py-3.5 rounded-full hover:bg-amber-50 transition-colors shadow-md"
@@ -216,7 +252,8 @@ export default function AboutPage() {
   return (
     <>
       <AboutHero />
-      <MissionaryStory />
+      <GreetingSection />
+      <CareerSection />
       <VisionSection />
       <AboutCTA />
     </>

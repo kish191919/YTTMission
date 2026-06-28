@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Heart, Mail, Video, Camera } from 'lucide-react'
 
 export default function Footer() {
@@ -9,9 +10,13 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                YT
-              </div>
+              <Image
+                src="/images/Logo.png"
+                alt="YTTM 로고"
+                width={40}
+                height={40}
+                className="h-10 w-10 object-contain"
+              />
               <div className="leading-tight">
                 <p className="text-sm font-bold text-white">YTTM</p>
                 <p className="text-xs text-amber-400">양영자 탁구선교회</p>
@@ -34,7 +39,7 @@ export default function Footer() {
                 { label: '선교 비전', href: '/about#vision' },
                 { label: '활동 갤러리', href: '/gallery' },
                 { label: '선교 소식', href: '/board' },
-                { label: '후원하기', href: 'https://ihappynanum.com' },
+                { label: '후원하기', href: 'https://www.ihappynanum.com/Nanum/B/4ZOM149MCQ' },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
@@ -69,7 +74,7 @@ export default function Footer() {
                 </a>
               </div>
               <Link
-                href="https://ihappynanum.com"
+                href="https://www.ihappynanum.com/Nanum/B/4ZOM149MCQ"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors mt-2"

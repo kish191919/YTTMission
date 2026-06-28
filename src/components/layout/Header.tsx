@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { Menu, X, Heart } from 'lucide-react'
 
 const navItems = [
   { label: '홈', href: '/' },
   { label: '소개', href: '/about' },
-  { label: '비전', href: '/about#vision' },
+  { label: '비전', href: '/vision' },
   {
     label: '갤러리',
     href: '/gallery',
@@ -26,15 +27,20 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-amber-100 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 h-[72px] flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-9 h-9 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold text-sm group-hover:bg-amber-700 transition-colors">
-            YT
-          </div>
+          <Image
+            src="/images/Logo.png"
+            alt="YTTM 로고"
+            width={44}
+            height={44}
+            className="h-11 w-11 object-contain"
+            priority
+          />
           <div className="leading-tight">
-            <p className="text-sm font-bold text-stone-800">YTTM</p>
-            <p className="text-xs text-amber-600 font-medium">양영자 탁구선교회</p>
+            <p className="text-base font-bold text-stone-800">YTTM</p>
+            <p className="text-sm text-amber-600 font-medium">양영자 탁구선교회</p>
           </div>
         </Link>
 
@@ -48,7 +54,7 @@ export default function Header() {
                 onMouseEnter={() => setDropdownOpen(item.href)}
                 onMouseLeave={() => setDropdownOpen(null)}
               >
-                <button className="px-4 py-2 text-sm font-medium text-stone-700 hover:text-amber-700 transition-colors rounded-lg hover:bg-amber-50">
+                <button className="px-4 py-2 text-base font-medium text-stone-700 hover:text-amber-700 transition-colors rounded-lg hover:bg-amber-50">
                   {item.label}
                 </button>
                 {dropdownOpen === item.href && (
@@ -69,7 +75,7 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-4 py-2 text-sm font-medium text-stone-700 hover:text-amber-700 transition-colors rounded-lg hover:bg-amber-50"
+                className="px-4 py-2 text-base font-medium text-stone-700 hover:text-amber-700 transition-colors rounded-lg hover:bg-amber-50"
               >
                 {item.label}
               </Link>
@@ -80,10 +86,10 @@ export default function Header() {
         {/* CTA + Mobile Toggle */}
         <div className="flex items-center gap-3">
           <Link
-            href="https://ihappynanum.com"
+            href="https://www.ihappynanum.com/Nanum/B/4ZOM149MCQ"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200 shadow-sm hover:shadow-md"
+            className="hidden sm:inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-base font-semibold px-4 py-2 rounded-full transition-all duration-200 shadow-sm hover:shadow-md"
           >
             <Heart size={14} />
             후원하기
@@ -124,7 +130,7 @@ export default function Header() {
           ))}
           <div className="px-6 pt-3 pb-1 border-t border-amber-50 mt-2">
             <Link
-              href="https://ihappynanum.com"
+              href="https://www.ihappynanum.com/Nanum/B/4ZOM149MCQ"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-1.5 bg-amber-600 text-white text-sm font-semibold px-4 py-2.5 rounded-full"
