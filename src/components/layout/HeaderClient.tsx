@@ -6,7 +6,13 @@ import { useState } from 'react'
 import { Menu, X, Heart, LogIn, LogOut, User } from 'lucide-react'
 import { signOutAction } from '@/app/actions/auth'
 
-const navItems = [
+type NavItem = {
+  label: string
+  href: string
+  children?: { label: string; href: string }[]
+}
+
+const navItems: NavItem[] = [
   { label: '홈', href: '/' },
   { label: '소개', href: '/about' },
   { label: '비전', href: '/vision' },
