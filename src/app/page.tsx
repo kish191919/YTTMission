@@ -50,7 +50,7 @@ function MissionaryGreeting() {
   return (
     <section className="py-20" style={{ backgroundColor: '#faf5eb' }}>
       <div className="max-w-6xl mx-auto px-4">
-        <div className="grid md:grid-cols-5 gap-12 items-start">
+        <div className="grid md:grid-cols-5 gap-12 items-center">
           {/* 텍스트 */}
           <div className="md:col-span-3 order-2 md:order-1">
             <h2 className="text-2xl md:text-3xl font-bold text-stone-800 mb-8 leading-snug">
@@ -75,6 +75,20 @@ function MissionaryGreeting() {
               <p>
                 1983년 여름의 어느 날을 저는 또 잊을 수가 없습니다...(계속)
               </p>
+            </div>
+
+            {/* 주요 이력 */}
+            <div className="mt-8 pt-6 border-t border-stone-300">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-stone-100 rounded-xl">
+                  <p className="text-2xl font-bold text-stone-800">1988</p>
+                  <p className="text-sm text-stone-500 mt-1">서울올림픽 탁구 금메달</p>
+                </div>
+                <div className="text-center p-4 bg-stone-100 rounded-xl">
+                  <p className="text-2xl font-bold text-stone-800">20년+</p>
+                  <p className="text-sm text-stone-500 mt-1">해외 선교 사역</p>
+                </div>
+              </div>
             </div>
           </div>
 

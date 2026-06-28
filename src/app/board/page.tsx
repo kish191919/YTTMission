@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { FileText, ChevronRight, Calendar } from 'lucide-react'
+import { FileText, ChevronRight, Calendar, PenSquare } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { formatDate } from '@/lib/utils'
 
 export const metadata: Metadata = {
@@ -75,6 +76,11 @@ export default async function BoardPage({
   const { category } = await searchParams
   const posts = await getPosts(category)
 
+  const supabaseServer = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabaseServer.auth.getUser()
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#fdfaf6' }}>
       {/* 헤더 */}
@@ -91,6 +97,18 @@ export default async function BoardPage({
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-10">
+        {/* 카테고리 탭 + 글쓰기 버튼 */}
+        <div className="flex flex-wrap items-center gap-2 mb-8">
+          {user && (
+            <Link
+              href="/board/write"
+              className="ml-auto inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors shadow-sm"
+            >
+              <PenSquare size={14} />
+              글쓰기
+            </Link>
+          )}
+        </div>
         {/* 카테고리 탭 */}
         <div className="flex flex-wrap gap-2 mb-8">
           {CATEGORIES.map((cat) => {

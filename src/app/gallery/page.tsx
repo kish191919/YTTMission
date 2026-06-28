@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Camera, ChevronRight } from 'lucide-react'
+import { Camera, ChevronRight, Upload } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 export const metadata: Metadata = {
   title: '갤러리',
@@ -68,6 +69,7 @@ type GalleryPhoto = {
   album: string
   taken_at: string | null
   created_at: string
+  media_type: 'image' | 'video'
 }
 
 function PhotoGrid({ photos }: { photos: GalleryPhoto[] }) {
@@ -88,12 +90,22 @@ function PhotoGrid({ photos }: { photos: GalleryPhoto[] }) {
           key={photo.id}
           className="group relative aspect-square bg-amber-50 rounded-xl overflow-hidden border border-stone-100 hover:shadow-md transition-shadow duration-200"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={photo.image_url}
-            alt={photo.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
+          {photo.media_type === 'video' ? (
+            <video
+              src={photo.image_url}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              muted
+              playsInline
+              preload="metadata"
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={photo.image_url}
+              alt={photo.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-3">
             <p className="text-white text-xs font-medium line-clamp-2">{photo.title}</p>
           </div>
@@ -111,6 +123,11 @@ export default async function GalleryPage({
   const { album } = await searchParams
   const photos = await getGalleryPhotos(album)
 
+  const supabaseServer = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabaseServer.auth.getUser()
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#fdfaf6' }}>
       {/* 헤더 */}
@@ -127,6 +144,19 @@ export default async function GalleryPage({
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-10">
+        {/* 업로드 버튼 (로그인 회원) */}
+        {user && (
+          <div className="flex justify-end mb-4">
+            <Link
+              href="/gallery/upload"
+              className="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors shadow-sm"
+            >
+              <Upload size={14} />
+              사진·동영상 올리기
+            </Link>
+          </div>
+        )}
+
         {/* 앨범 탭 */}
         <div className="flex flex-wrap gap-2 mb-8">
           <Link

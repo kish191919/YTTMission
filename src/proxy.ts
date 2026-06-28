@@ -43,9 +43,17 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/admin/hero', request.url))
   }
 
+  // 회원 전용 경로: 미인증 시 /login 으로 리디렉트
+  const memberPaths = ['/gallery/upload', '/board/write']
+  if (memberPaths.includes(path) && !user) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('next', path)
+    return NextResponse.redirect(loginUrl)
+  }
+
   return response
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/gallery/upload', '/board/write'],
 }

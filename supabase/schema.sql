@@ -104,3 +104,84 @@ create policy "hero-media 관리자 삭제"
   on storage.objects for delete
   to authenticated
   using (bucket_id = 'hero-media');
+
+-- ──────────────────────────────────────────────────
+-- 회원 기능 마이그레이션
+-- ──────────────────────────────────────────────────
+
+-- A. user_profiles 테이블
+create table if not exists public.user_profiles (
+  id           uuid        primary key references auth.users(id) on delete cascade,
+  display_name text        not null default '',
+  created_at   timestamptz not null default now()
+);
+
+alter table public.user_profiles enable row level security;
+
+create policy "프로필 공개 읽기"
+  on public.user_profiles for select
+  using (true);
+
+create policy "본인 프로필 수정"
+  on public.user_profiles for update
+  to authenticated
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
+
+-- 회원가입 시 자동으로 프로필 행 생성 트리거
+create or replace function public.handle_new_user()
+returns trigger language plpgsql security definer set search_path = ''
+as $$
+begin
+  insert into public.user_profiles (id, display_name)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data ->> 'display_name', split_part(new.email, '@', 1))
+  );
+  return new;
+end;
+$$;
+
+create or replace trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- B. posts / gallery 에 회원 연결 컬럼 추가
+alter table public.posts
+  add column if not exists user_id uuid references auth.users(id) on delete set null;
+
+alter table public.gallery
+  add column if not exists user_id uuid references auth.users(id) on delete set null,
+  add column if not exists media_type text not null default 'image'
+    check (media_type in ('image', 'video'));
+
+-- 회원 게시글 작성 (즉시 공개)
+create policy "회원 게시글 작성"
+  on public.posts for insert
+  to authenticated
+  with check (auth.uid() = user_id and published = true);
+
+-- 회원 갤러리 업로드
+create policy "회원 갤러리 업로드"
+  on public.gallery for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+-- C. member-uploads Storage 버킷
+-- (대시보드에서 버킷 'member-uploads' 생성 후 실행)
+-- insert into storage.buckets (id, name, public)
+--   values ('member-uploads', 'member-uploads', true) on conflict (id) do nothing;
+
+create policy "member-uploads 공개 읽기"
+  on storage.objects for select
+  using (bucket_id = 'member-uploads');
+
+create policy "member-uploads 회원 업로드"
+  on storage.objects for insert
+  to authenticated
+  with check (bucket_id = 'member-uploads');
+
+create policy "member-uploads 본인 삭제"
+  on storage.objects for delete
+  to authenticated
+  using (bucket_id = 'member-uploads' and (storage.foldername(name))[1] = auth.uid()::text);

@@ -29,7 +29,8 @@ function FallbackHero() {
 
 export default function HeroSlideshow({ items }: Props) {
   const [current, setCurrent] = useState(0)
-  const [muted, setMuted] = useState(true)
+  const [muted, setMuted] = useState(false)
+  const mutedRef = useRef(false)
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
   const imageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hasVideo = items.some((item) => item.media_type === 'video')
@@ -44,7 +45,11 @@ export default function HeroSlideshow({ items }: Props) {
       if (!video) return
       if (i === current) {
         video.currentTime = 0
-        video.play().catch(() => {})
+        // 브라우저 autoplay 정책상 muted로 시작 후 재생되면 소리 활성화 시도
+        video.muted = true
+        video.play().then(() => {
+          video.muted = mutedRef.current
+        }).catch(() => {})
       } else {
         video.pause()
         video.currentTime = 0
@@ -63,6 +68,7 @@ export default function HeroSlideshow({ items }: Props) {
   function toggleMute() {
     const next = !muted
     setMuted(next)
+    mutedRef.current = next
     videoRefs.current.forEach((video) => {
       if (video) video.muted = next
     })

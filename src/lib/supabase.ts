@@ -8,6 +8,21 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export type Database = {
   public: {
     Tables: {
+      user_profiles: {
+        Row: {
+          id: string
+          display_name: string
+          created_at: string
+        }
+        Insert: {
+          id: string
+          display_name?: string
+        }
+        Update: {
+          display_name?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           id: number
@@ -17,6 +32,7 @@ export type Database = {
           image_url: string | null
           created_at: string
           published: boolean
+          user_id: string | null
         }
         Insert: {
           title: string
@@ -24,6 +40,7 @@ export type Database = {
           category?: string
           image_url?: string | null
           published?: boolean
+          user_id?: string | null
         }
         Update: {
           title?: string
@@ -31,6 +48,7 @@ export type Database = {
           category?: string
           image_url?: string | null
           published?: boolean
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -43,6 +61,8 @@ export type Database = {
           album: string
           taken_at: string | null
           created_at: string
+          user_id: string | null
+          media_type: 'image' | 'video'
         }
         Insert: {
           title: string
@@ -50,6 +70,8 @@ export type Database = {
           image_url: string
           album?: string
           taken_at?: string | null
+          user_id?: string | null
+          media_type?: 'image' | 'video'
         }
         Update: {
           title?: string
@@ -57,6 +79,8 @@ export type Database = {
           image_url?: string
           album?: string
           taken_at?: string | null
+          user_id?: string | null
+          media_type?: 'image' | 'video'
         }
         Relationships: []
       }
