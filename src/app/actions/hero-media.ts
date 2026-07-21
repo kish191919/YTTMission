@@ -1,13 +1,12 @@
 'use server'
 
-import { cookies } from 'next/headers'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
+import { isAdmin } from '@/lib/admin'
 import { revalidatePath } from 'next/cache'
 
 async function requireAdminOrAuth() {
-  const cookieStore = await cookies()
-  if (cookieStore.get('yttm_admin')?.value === '1') {
+  if (await isAdmin()) {
     return createAdminClient()
   }
   const supabase = await createSupabaseServerClient()

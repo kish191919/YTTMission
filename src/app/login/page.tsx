@@ -29,7 +29,9 @@ function LoginForm() {
 
     // 어드민 자격증명 감지
     if (email.trim() === 'admin' && password === 'yttm') {
-      await adminSignInAction(next)
+      await adminSignInAction()
+      router.push(next)
+      router.refresh()
       return
     }
 

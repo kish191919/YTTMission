@@ -53,8 +53,12 @@ export default function GalleryPhotoGrid({ photos, admin, currentUserId, zipFile
   const [isDeleting, setIsDeleting] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
+  function isOwnedByCurrentUser(photo: GalleryPhoto) {
+    return photo.user_id !== null && photo.user_id === currentUserId
+  }
+
   const deletablePhotos = photos.filter(
-    (p) => selectedIds.has(p.id) && (admin || p.user_id === currentUserId)
+    (p) => selectedIds.has(p.id) && (admin || isOwnedByCurrentUser(p))
   )
 
   function toggleSelected(id: number) {
@@ -260,12 +264,12 @@ export default function GalleryPhotoGrid({ photos, admin, currentUserId, zipFile
                   <Check size={13} />
                 </button>
               )}
-              {selectionMode && (admin || photo.user_id === currentUserId) && (
+              {selectionMode && (admin || isOwnedByCurrentUser(photo)) && (
                 <div onClick={(e) => e.stopPropagation()}>
                   <PhotoItemControls
                     photoId={photo.id}
-                    canEdit={photo.user_id === currentUserId}
-                    canDelete={admin || photo.user_id === currentUserId}
+                    canEdit={isOwnedByCurrentUser(photo)}
+                    canDelete={admin || isOwnedByCurrentUser(photo)}
                   />
                 </div>
               )}

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { createAdminClient } from '@/lib/supabase-admin'
+import { isAdmin } from '@/lib/admin'
 
 export async function POST(request: NextRequest) {
-  const cookieStore = await cookies()
-  if (cookieStore.get('yttm_admin')?.value !== '1') {
+  if (!(await isAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

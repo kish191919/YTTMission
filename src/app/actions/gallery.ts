@@ -1,8 +1,8 @@
 'use server'
 
-import { cookies } from 'next/headers'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
+import { isAdmin } from '@/lib/admin'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -45,8 +45,7 @@ function extractStoragePath(imageUrl: string) {
 }
 
 export async function deleteGalleryItemAction(id: number) {
-  const cookieStore = await cookies()
-  const isAdminUser = cookieStore.get('yttm_admin')?.value === '1'
+  const isAdminUser = await isAdmin()
 
   if (isAdminUser) {
     const supabase = createAdminClient()
@@ -84,8 +83,7 @@ export async function deleteGalleryItemAction(id: number) {
 }
 
 export async function deleteAlbumAction(album: string) {
-  const cookieStore = await cookies()
-  const isAdminUser = cookieStore.get('yttm_admin')?.value === '1'
+  const isAdminUser = await isAdmin()
 
   if (isAdminUser) {
     const supabase = createAdminClient()
