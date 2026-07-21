@@ -4,6 +4,7 @@ import { Camera, ChevronRight, Upload } from 'lucide-react'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { isAdmin } from '@/lib/admin'
 import AlbumDeleteButton from '@/components/gallery/AlbumDeleteButton'
+import AlbumFilterSelect from '@/components/gallery/AlbumFilterSelect'
 import GalleryPhotoGrid from '@/components/gallery/GalleryPhotoGrid'
 
 export const metadata: Metadata = {
@@ -85,7 +86,9 @@ export default async function GalleryPage({
           </span>
           <h1 className="text-4xl font-black text-stone-800 mb-4">선교 활동 갤러리</h1>
           <p className="text-stone-500 max-w-xl mx-auto">
-            탁구를 통해 전해지는 복음의 현장을 사진으로 만나보세요.
+            탁구를 통해 전해지는 복음의 현장을{' '}
+            <br className="sm:hidden" />
+            사진으로 만나보세요.
           </p>
         </div>
       </div>
@@ -107,33 +110,9 @@ export default async function GalleryPage({
           </div>
         )}
 
-        {/* 앨범 탭 */}
+        {/* 앨범 필터 */}
         {albums.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-8">
-            <Link
-              href="/gallery"
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
-                !album
-                  ? 'bg-amber-600 text-white shadow-sm'
-                  : 'bg-white text-stone-600 border border-stone-200 hover:border-amber-300 hover:text-amber-700'
-              }`}
-            >
-              전체
-            </Link>
-            {albums.map((a) => (
-              <Link
-                key={a.name}
-                href={`/gallery?album=${encodeURIComponent(a.name)}`}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
-                  album === a.name
-                    ? 'bg-amber-600 text-white shadow-sm'
-                    : 'bg-white text-stone-600 border border-stone-200 hover:border-amber-300 hover:text-amber-700'
-                }`}
-              >
-                {a.name}
-              </Link>
-            ))}
-          </div>
+          <AlbumFilterSelect albums={albums} currentAlbum={album} />
         )}
 
         {/* 앨범 카드 (전체 보기일 때) */}
