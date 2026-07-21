@@ -29,7 +29,7 @@ export default function Footer() {
           </div>
 
           {/* Nav Links */}
-          <nav className="flex flex-wrap gap-x-6 gap-y-1">
+          <nav className="flex w-full justify-between sm:w-auto sm:flex-wrap sm:justify-start gap-x-6 gap-y-1">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
@@ -46,16 +46,15 @@ export default function Footer() {
             href="https://www.ihappynanum.com/Nanum/B/4ZOM149MCQ"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors shrink-0"
+            className="hidden sm:inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors shrink-0"
           >
             <Heart size={13} />
             선교 후원하기
           </Link>
         </div>
 
-        <div className="border-t border-stone-800 mt-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-1">
+        <div className="border-t border-stone-800 mt-6 pt-4 flex flex-col sm:flex-row justify-center items-center gap-1">
           <p className="text-xs text-white">© 2024 YTTM 양영자탁구선교회. All rights reserved.</p>
-          <p className="text-xs text-stone-600">Powered by Next.js + Supabase</p>
         </div>
       </div>
     </footer>
