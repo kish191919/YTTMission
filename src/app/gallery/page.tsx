@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { Camera, ChevronRight, Upload } from 'lucide-react'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { isAdmin } from '@/lib/admin'
-import PhotoAdminControls from '@/components/gallery/PhotoAdminControls'
+import AlbumDeleteButton from '@/components/gallery/AlbumDeleteButton'
+import GalleryPhotoGrid from '@/components/gallery/GalleryPhotoGrid'
 
 export const metadata: Metadata = {
   title: '갤러리',
@@ -44,59 +45,10 @@ async function getGalleryPhotos(album?: string) {
   return data ?? []
 }
 
-type GalleryPhoto = {
-  id: number
-  title: string
-  description: string | null
-  image_url: string
-  album: string
-  taken_at: string | null
-  created_at: string
-  media_type: 'image' | 'video'
-}
-
-function PhotoGrid({ photos, admin }: { photos: GalleryPhoto[]; admin: boolean }) {
-  if (photos.length === 0) {
-    return (
-      <div className="text-center py-20 text-stone-400">
-        <Camera size={48} className="mx-auto mb-4 opacity-40" />
-        <p className="text-lg font-medium">아직 등록된 사진이 없습니다</p>
-        <p className="text-sm mt-1">곧 선교 현장의 사진이 업로드될 예정입니다.</p>
-      </div>
-    )
-  }
-
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-      {photos.map((photo) => (
-        <div
-          key={photo.id}
-          className="group relative aspect-square bg-amber-50 rounded-xl overflow-hidden border border-stone-100 hover:shadow-md transition-shadow duration-200"
-        >
-          {photo.media_type === 'video' ? (
-            <video
-              src={photo.image_url}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              muted
-              playsInline
-              preload="metadata"
-            />
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={photo.image_url}
-              alt={photo.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-3">
-            <p className="text-white text-xs font-medium line-clamp-2">{photo.title}</p>
-          </div>
-          {admin && <PhotoAdminControls photoId={photo.id} />}
-        </div>
-      ))}
-    </div>
-  )
+async function getAlbumOwnerIds(album: string) {
+  const supabase = await createSupabaseServerClient()
+  const { data } = await supabase.from('gallery').select('user_id').eq('album', album)
+  return data ?? []
 }
 
 export default async function GalleryPage({
@@ -116,6 +68,13 @@ export default async function GalleryPage({
     data: { user },
   } = await supabaseServer.auth.getUser()
 
+  let canDeleteAlbum = false
+  if (album) {
+    const ownerRows = await getAlbumOwnerIds(album)
+    canDeleteAlbum =
+      admin || (!!user && ownerRows.length > 0 && ownerRows.every((r) => r.user_id === user.id))
+  }
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#fdfaf6' }}>
       {/* 헤더 */}
@@ -132,16 +91,19 @@ export default async function GalleryPage({
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-10">
-        {/* 업로드 버튼 (로그인 회원) */}
-        {user && (
-          <div className="flex justify-end mb-4">
-            <Link
-              href="/gallery/upload"
-              className="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors shadow-sm"
-            >
-              <Upload size={14} />
-              사진·동영상 올리기
-            </Link>
+        {/* 업로드 버튼 (로그인 회원) + 앨범 전체 삭제 버튼 */}
+        {(user || (album && canDeleteAlbum)) && (
+          <div className="flex justify-end items-center gap-2 mb-4">
+            {user && (
+              <Link
+                href="/gallery/upload"
+                className="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors shadow-sm"
+              >
+                <Upload size={14} />
+                사진·동영상 올리기
+              </Link>
+            )}
+            {album && canDeleteAlbum && <AlbumDeleteButton album={album} />}
           </div>
         )}
 
@@ -224,7 +186,12 @@ export default async function GalleryPage({
             <div className="mb-6">
               <h2 className="text-xl font-bold text-stone-800">{album}</h2>
             </div>
-            <PhotoGrid photos={photos} admin={admin} />
+            <GalleryPhotoGrid
+              photos={photos}
+              admin={admin}
+              currentUserId={user?.id ?? null}
+              zipFileName={`${album}.zip`}
+            />
           </>
         )}
 
@@ -232,7 +199,12 @@ export default async function GalleryPage({
         {!album && photos.length > 0 && (
           <div>
             <h2 className="text-xl font-bold text-stone-800 mb-5">최근 사진</h2>
-            <PhotoGrid photos={photos} admin={admin} />
+            <GalleryPhotoGrid
+              photos={photos}
+              admin={admin}
+              currentUserId={user?.id ?? null}
+              zipFileName="갤러리.zip"
+            />
           </div>
         )}
 

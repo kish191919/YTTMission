@@ -186,3 +186,15 @@ create policy "member-uploads 본인 삭제"
   on storage.objects for delete
   to authenticated
   using (bucket_id = 'member-uploads' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- D. 본인 갤러리 수정/삭제
+create policy "본인 갤러리 수정"
+  on public.gallery for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy "본인 갤러리 삭제"
+  on public.gallery for delete
+  to authenticated
+  using (auth.uid() = user_id);
