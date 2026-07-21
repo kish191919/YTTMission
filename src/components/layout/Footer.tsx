@@ -3,9 +3,10 @@ import Image from 'next/image'
 import { Heart } from 'lucide-react'
 
 const NAV_LINKS = [
-  { label: '선교사 소개', href: '/about' },
-  { label: '선교 비전', href: '/about#vision' },
-  { label: '활동 갤러리', href: '/gallery' },
+  { label: '홈', href: '/' },
+  { label: '소개', href: '/about' },
+  { label: '비전', href: '/vision' },
+  { label: '갤러리', href: '/gallery' },
 ]
 
 export default function Footer() {

@@ -145,14 +145,14 @@ export default function VisionPage() {
               <div className="absolute inset-0 bg-white/65" />
             </div>
             <div className="relative ml-auto max-w-2xl text-right">
-              <p className="font-serif font-medium text-stone-800 text-xl md:text-2xl leading-relaxed tracking-wide break-keep">
+              <p className="font-serif font-semibold text-stone-900 text-xl md:text-2xl leading-relaxed tracking-wide break-keep">
                 (하나님의 나라는) 마치 겨자씨와 같다.
                 <br />
                 어떤 사람이 그것을 가져다가 자기 정원에 심었더니,
                 <br />
                 자라서 나무가 되어, 공중의 새들이 그 가지에 깃들었다.
               </p>
-              <p className="mt-4 font-serif italic text-sm text-stone-500 tracking-wide">
+              <p className="mt-4 font-serif italic text-sm font-medium tracking-wide" style={{ color: MAROON }}>
                 (누가복음 13:19 표준새번역)
               </p>
             </div>

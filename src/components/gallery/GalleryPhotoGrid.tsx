@@ -260,7 +260,7 @@ export default function GalleryPhotoGrid({ photos, admin, currentUserId, zipFile
                   <Check size={13} />
                 </button>
               )}
-              {!selectionMode && (admin || photo.user_id === currentUserId) && (
+              {selectionMode && (admin || photo.user_id === currentUserId) && (
                 <div onClick={(e) => e.stopPropagation()}>
                   <PhotoItemControls
                     photoId={photo.id}

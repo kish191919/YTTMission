@@ -229,15 +229,12 @@ function SupportCTA() {
   return (
     <section className="py-20 bg-amber-50">
       <div className="max-w-4xl mx-auto px-4 text-center">
-        <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Heart size={28} className="text-amber-600" />
-        </div>
         <h2 className="text-3xl md:text-4xl font-black text-stone-800 mb-4">
           선교를 함께 만들어가세요
         </h2>
-        <p className="text-lg text-stone-500 mb-10 max-w-xl mx-auto break-keep">
-          여러분의 기도와 후원이 탁구공 하나를 통해 열방에 복음을 전하는
-          귀한 통로가 됩니다.
+        <p className="text-lg text-stone-500 mb-10 max-w-xl md:max-w-none mx-auto break-keep md:whitespace-nowrap">
+          여러분의 기도와 후원이 탁구공 하나를 통해
+          <br className="md:hidden" /> 열방에 복음을 전하는 귀한 통로가 됩니다.
         </p>
         <div className="flex justify-center">
           <Link

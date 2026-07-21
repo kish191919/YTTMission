@@ -177,13 +177,13 @@ export default function HeaderClient({ user, displayName, isAdmin }: Props) {
 
       {/* Mobile Nav */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-amber-100 bg-white shadow-lg">
-          <nav className="divide-y divide-stone-100">
+        <div className="md:hidden border-t border-amber-100 bg-white shadow-xl rounded-b-3xl">
+          <nav className="flex flex-col gap-1 px-4 py-3">
             {navItems.map((item) => (
               <div key={item.href}>
                 <Link
                   href={item.href}
-                  className="flex items-center px-6 py-4 text-base font-semibold text-stone-700 hover:text-amber-700 hover:bg-amber-50 transition-colors"
+                  className="flex items-center justify-center px-4 py-3.5 text-base font-semibold text-stone-700 hover:text-amber-700 hover:bg-amber-50 rounded-xl text-center transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
                   {item.label}
@@ -192,7 +192,7 @@ export default function HeaderClient({ user, displayName, isAdmin }: Props) {
                   <Link
                     key={child.href}
                     href={child.href}
-                    className="flex items-center px-10 py-3 text-sm text-stone-500 hover:text-amber-700 hover:bg-amber-50 transition-colors"
+                    className="flex items-center justify-center px-4 py-2.5 text-sm text-stone-500 hover:text-amber-700 hover:bg-amber-50 rounded-lg text-center transition-colors"
                     onClick={() => setMobileOpen(false)}
                   >
                     {child.label}
@@ -201,7 +201,7 @@ export default function HeaderClient({ user, displayName, isAdmin }: Props) {
               </div>
             ))}
           </nav>
-          <div className="px-6 py-4 border-t border-amber-100 space-y-3">
+          <div className="px-4 py-4 border-t border-amber-100 space-y-3">
             <Link
               href="https://www.ihappynanum.com/Nanum/B/4ZOM149MCQ"
               target="_blank"
