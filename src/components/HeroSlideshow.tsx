@@ -16,7 +16,7 @@ interface Props {
 
 function FallbackHero() {
   return (
-    <section className="relative h-[calc(100vh-4rem)] overflow-hidden bg-gradient-to-br from-amber-900 via-amber-800 to-stone-900">
+    <section className="relative h-[calc(100dvh-72px)] overflow-hidden bg-gradient-to-br from-amber-900 via-amber-800 to-stone-900">
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-10 w-64 h-64 border-2 border-amber-300 rounded-full" />
         <div className="absolute top-40 left-20 w-40 h-40 border border-amber-300 rounded-full" />
@@ -79,7 +79,7 @@ export default function HeroSlideshow({ items }: Props) {
   }
 
   return (
-    <section className="relative h-[calc(100vh-4rem)] overflow-hidden">
+    <section className="relative h-[calc(100dvh-72px)] overflow-hidden">
       {/* 미디어 레이어 */}
       {items.map((item, i) => (
         <div
@@ -89,25 +89,46 @@ export default function HeroSlideshow({ items }: Props) {
           aria-hidden={i !== current}
         >
           {item.media_type === 'image' ? (
-            <Image
-              src={item.media_url}
-              alt={item.title}
-              fill
-              className="object-cover"
-              priority={i === 0}
-              sizes="100vw"
-            />
+            <>
+              {/* 블러 배경: 잘리는 부분 없이 여백을 흐린 확대 이미지로 채움 */}
+              <Image
+                src={item.media_url}
+                alt=""
+                fill
+                aria-hidden
+                className="object-cover blur-2xl scale-110 opacity-70"
+              />
+              <Image
+                src={item.media_url}
+                alt={item.title}
+                fill
+                className="object-contain"
+                priority={i === 0}
+                sizes="100vw"
+              />
+            </>
           ) : (
-            // eslint-disable-next-line jsx-a11y/media-has-caption
-            <video
-              ref={(el) => { videoRefs.current[i] = el }}
-              src={item.media_url}
-              autoPlay={i === 0}
-              muted
-              playsInline
-              onEnded={goNext}
-              className="w-full h-full object-cover"
-            />
+            <>
+              {/* 블러 배경: 잘리는 부분 없이 여백을 흐린 확대 영상으로 채움 */}
+              <video
+                src={item.media_url}
+                autoPlay={i === current}
+                muted
+                loop
+                playsInline
+                aria-hidden
+                className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-70"
+              />
+              <video
+                ref={(el) => { videoRefs.current[i] = el }}
+                src={item.media_url}
+                autoPlay={i === 0}
+                muted
+                playsInline
+                onEnded={goNext}
+                className="absolute inset-0 w-full h-full object-contain"
+              />
+            </>
           )}
         </div>
       ))}

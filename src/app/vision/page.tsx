@@ -140,7 +140,7 @@ export default function VisionPage() {
                 src="/images/tree.jpg"
                 alt="겨자씨 나무"
                 fill
-                className="object-cover object-center"
+                className="object-cover object-center scale-x-125 -translate-x-[10%]"
               />
               <div className="absolute inset-0 bg-white/65" />
             </div>
