@@ -18,7 +18,6 @@ const navItems: NavItem[] = [
   { label: '소개', href: '/about' },
   { label: '비전', href: '/vision' },
   { label: '갤러리', href: '/gallery' },
-  { label: '게시판', href: '/board' },
 ]
 
 type Props = {
@@ -62,7 +61,7 @@ export default function HeaderClient({ user, displayName, isAdmin }: Props) {
           />
           <div className="leading-tight">
             <p className="text-base font-bold text-stone-800">YTTM</p>
-            <p className="text-sm text-amber-600 font-medium">양영자 탁구선교회</p>
+            <p className="text-sm text-amber-600 font-medium">양영자탁구선교회</p>
           </div>
         </Link>
 

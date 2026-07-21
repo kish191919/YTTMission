@@ -118,7 +118,7 @@ function RecentActivities({ albums }: { albums: RecentAlbum[] }) {
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
           <span className="inline-block text-amber-600 font-semibold text-sm uppercase tracking-wider mb-3">
-            선교 활동
+            Activities
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-stone-800 mb-4">최근 선교 현장</h2>
           <p className="text-lg text-stone-500 max-w-2xl mx-auto">
@@ -235,11 +235,11 @@ function SupportCTA() {
         <h2 className="text-3xl md:text-4xl font-black text-stone-800 mb-4">
           선교를 함께 만들어가세요
         </h2>
-        <p className="text-lg text-stone-500 mb-10 max-w-xl mx-auto">
+        <p className="text-lg text-stone-500 mb-10 max-w-xl mx-auto break-keep">
           여러분의 기도와 후원이 탁구공 하나를 통해 열방에 복음을 전하는
           귀한 통로가 됩니다.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex justify-center">
           <Link
             href="https://www.ihappynanum.com/Nanum/B/4ZOM149MCQ"
             target="_blank"
@@ -248,13 +248,6 @@ function SupportCTA() {
           >
             <Heart size={18} />
             정기 후원하기
-          </Link>
-          <Link
-            href="/board"
-            className="inline-flex items-center justify-center gap-2 border-2 border-amber-600 text-amber-700 hover:bg-amber-100 font-semibold px-8 py-4 rounded-full transition-all duration-200 text-base"
-          >
-            선교 소식 보기
-            <ChevronRight size={16} />
           </Link>
         </div>
       </div>

@@ -14,7 +14,7 @@ function AboutHero() {
     <section className="bg-gradient-to-b from-amber-50 to-white pt-20 pb-10">
       <div className="max-w-4xl mx-auto px-4 text-center">
         <span className="inline-block text-amber-600 font-semibold text-sm uppercase tracking-wider mb-4">
-          About YTTM
+          Welcome Message
         </span>
         <h1 className="text-4xl md:text-5xl font-black text-stone-800 mb-6 leading-tight">
           양영자 선교사를<br />소개합니다
@@ -60,7 +60,7 @@ function GreetingSection() {
                   1988년 9월 30일. 그 날은 제가 평생 잊을 수 없는 날입니다. 그 날은 올림픽에서 제가 현정화 선수와 함께 탁구 역사상 최초의 올림픽 탁구 금메달을 딴 날입니다. 그 메달은 하루 아침에 이루어진 것이 아니었습니다. 어렸을 때에 탁구일지에 대한민국을 빛내는 국가대표선수가 되고 싶다는 꿈을 적었고, 국제대회에서 메달을 따고 싶다는 꿈을 적었습니다. 그러나, 그 꿈을 이루는 데에는 고된 훈련이 따랐고, 몸은 몸대로 너무 아팠고, 탁구를 그만둬야 하나라는 생각이 들 정도로 힘든 시간들도 있었습니다. 그러나 결국 제가 꿈꿨던 국가대표가 되었고, 국제대회에서도 각종 메달들을 땄습니다. 그리고, 온 국민의 응원과 성원으로 올림픽 금메달도 땄습니다.
                 </p>
                 <p>
-                  1983년 여름의 어느 날을 저는 또 잊을 수가 없습니다. 그 날은 제가 예수님을 저의 구주로 영접한 날입니다. 그 날 저는 저같은 죄인을 위해 예수그리스도께서 십자가에서 못박혀 죽고 다시 사셨다는 사실을 접하고 한없이 울었습니다. 그 이후 제가 국가대표가 되어 국제대회에서 메달들을 따기까지 하나님은 저와 함께 하셨고, 때마다 성경말씀으로 인도하셨고, 깨닫게 하셨습니다. 탁구채조차 들 수 없었던 저의 팔을 치유해 주셨고, 병상에 누워 간절히 간구하던 저를 탁구대회에 설 수 있게 해 주셨습니다. 하나님은 그렇게 제가 금메달을 딸 수 있게 해 주셨습니다.
+                  1983년 여름의 어느 날을 저는 또 잊을 수가 없습니다. 그 날은 제가 예수님을 저의 구주로 영접한 날입니다. 그 날 저는 저같은 죄인을 위해 예수그리스도께서 십자가에서 못박혀 죽으시고 다시 사셨다는 사실을 접하고 한없이 울었습니다. 그 이후 제가 국가대표가 되어 국제대회에서 메달들을 따기까지 하나님은 저와 함께 하셨고, 때마다 성경말씀으로 인도하셨고, 깨닫게 하셨습니다. 탁구채조차 들 수 없었던 저의 팔을 치유해 주셨고, 병상에 누워 간절히 간구하던 저를 탁구대회에 설 수 있게 해 주셨습니다. 하나님은 그렇게 제가 금메달을 딸 수 있게 해 주셨습니다.
                 </p>
                 <p>
                   저는 고백합니다. 나의 나 된 것은 오직 주님의 은혜라고! 하나님은 제가 탁구에서 은퇴한 후 아주 심한 우울증에 빠졌을 때에도 저를 건져주셨습니다. 그리고, 14년간 몽골선교사로 보내주셔서 그 곳의 영혼들을 위해 섬기는 특권을 주셨습니다. 이제는 가는 곳마다 서는 곳마다 복음을 전하도록 인도하고 계십니다. 저는 또 고백합니다. 금메달이 귀하지만 하나님을 믿는 믿음은 더욱 귀하다고!
@@ -105,10 +105,10 @@ function CareerSection() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-14">
           <span className="inline-block text-amber-600 font-semibold text-sm uppercase tracking-wider mb-3">
-            Biography
+            Profile
           </span>
           <h2 className="text-3xl md:text-4xl font-black text-stone-800">
-            양영자 선교사의 두 길
+            양영자 선교사의 길
           </h2>
         </div>
 
@@ -167,7 +167,7 @@ function VisionSection() {
     {
       icon: Globe,
       title: '열방을 향한 선교',
-      description: '국경을 넘어 아시아와 전 세계를 향해, 탁구로 연결되는 선교의 다리를 놓습니다.',
+      description: '국경을 넘어 전 세계를 향해, 탁구로 연결되는 선교의 다리를 놓습니다.',
     },
     {
       icon: Zap,
@@ -176,8 +176,8 @@ function VisionSection() {
     },
     {
       icon: Heart,
-      title: '지속 가능한 사역',
-      description: '단기 방문에 그치지 않고 현지와 지속적인 관계를 이어가는 사역을 지향합니다.',
+      title: '국제탁구캠프 및 대회',
+      description: '해외의 청소년선수들을 초청해 탁구를 가르치며 복음을 전하고 국제 크리스천 탁구대회를 개최합니다',
     },
   ]
 
@@ -186,10 +186,10 @@ function VisionSection() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-14">
           <span className="inline-block text-amber-600 font-semibold text-sm uppercase tracking-wider mb-3">
-            Vision
+            Missions
           </span>
           <h2 className="text-3xl md:text-4xl font-black text-stone-800 mb-4">
-            YTTM의 선교 비전
+            YTTM의 선교
           </h2>
           <p className="text-lg text-stone-500 max-w-2xl mx-auto">
             탁구공 하나가 복음의 씨앗이 되는 세상을 꿈꿉니다.

@@ -40,6 +40,7 @@ const activities = [
   '전도 및 선교용 탁구용품 후원',
   '해외 한인 및 현지인교회 탁구행사 지원',
   '탁구 유망주 발굴 및 지원',
+  '국내 이주민 선교',
   '선교자원 동원',
   '기독교 문서와 전도지 배포',
   '신앙간증',
@@ -54,7 +55,7 @@ export default function VisionPage() {
           <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: MAROON }}>
             우리의 비전
           </h1>
-          <p className="text-base text-stone-700 leading-relaxed">
+          <p className="text-lg md:text-xl text-stone-700 leading-relaxed">
             하나님 나라를 전하는 축복의 통로되기 (눅 13:19)
           </p>
         </div>
@@ -63,7 +64,7 @@ export default function VisionPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: MAROON }}>
             우리의 미션
           </h2>
-          <p className="text-base text-stone-700 leading-relaxed">
+          <p className="text-lg md:text-xl text-stone-700 leading-relaxed">
             금보다 더 귀한 복음을 탁구공에 담아 전달하며 섬기며
           </p>
         </div>
@@ -133,23 +134,25 @@ export default function VisionPage() {
       {/* 성경 말씀 인용 */}
       <section className="py-16 mt-8 bg-[#faf8f5]">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="relative rounded-2xl overflow-hidden shadow-lg pt-12 pb-20 px-10">
-            <div className="absolute inset-0">
+          <div className="relative rounded-2xl overflow-hidden shadow-lg pt-12 pb-20 px-10 min-h-[460px] md:min-h-[560px]">
+            <div className="absolute inset-0 bg-amber-50">
               <Image
-                src="/images/vision-seedling.jpg"
-                alt="겨자씨"
+                src="/images/tree.jpg"
+                alt="겨자씨 나무"
                 fill
                 className="object-cover object-center"
               />
               <div className="absolute inset-0 bg-white/65" />
             </div>
-            <div className="relative ml-auto max-w-md text-right">
-              <p className="text-stone-800 text-base md:text-lg leading-relaxed">
-                (하나님의 나라는) 마치 겨자씨와 같다.{" "}
-                어떤 사람이 그것을 가져다가 자기 정원에 심었더니,{" "}
+            <div className="relative ml-auto max-w-2xl text-right">
+              <p className="font-serif font-medium text-stone-800 text-xl md:text-2xl leading-relaxed tracking-wide break-keep">
+                (하나님의 나라는) 마치 겨자씨와 같다.
+                <br />
+                어떤 사람이 그것을 가져다가 자기 정원에 심었더니,
+                <br />
                 자라서 나무가 되어, 공중의 새들이 그 가지에 깃들었다.
               </p>
-              <p className="mt-3 text-xs text-stone-500">
+              <p className="mt-4 font-serif italic text-sm text-stone-500 tracking-wide">
                 (누가복음 13:19 표준새번역)
               </p>
             </div>

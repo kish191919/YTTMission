@@ -6,7 +6,6 @@ const NAV_LINKS = [
   { label: '선교사 소개', href: '/about' },
   { label: '선교 비전', href: '/about#vision' },
   { label: '활동 갤러리', href: '/gallery' },
-  { label: '선교 소식', href: '/board' },
 ]
 
 export default function Footer() {
@@ -25,7 +24,7 @@ export default function Footer() {
             />
             <div className="leading-tight">
               <p className="text-sm font-bold text-white">YTTM</p>
-              <p className="text-xs text-amber-400">양영자 탁구선교회</p>
+              <p className="text-xs text-amber-400">양영자탁구선교회</p>
             </div>
           </div>
 
@@ -55,7 +54,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-stone-800 mt-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-1">
-          <p className="text-xs text-stone-500">© 2024 YTTM 양영자 탁구선교회. All rights reserved.</p>
+          <p className="text-xs text-white">© 2024 YTTM 양영자탁구선교회. All rights reserved.</p>
           <p className="text-xs text-stone-600">Powered by Next.js + Supabase</p>
         </div>
       </div>
