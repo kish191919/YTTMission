@@ -29,8 +29,8 @@ function FallbackHero() {
 
 export default function HeroSlideshow({ items }: Props) {
   const [current, setCurrent] = useState(0)
-  const [muted, setMuted] = useState(false)
-  const mutedRef = useRef(false)
+  const [muted, setMuted] = useState(true)
+  const mutedRef = useRef(true)
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
   const imageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hasVideo = items.some((item) => item.media_type === 'video')
@@ -45,11 +45,9 @@ export default function HeroSlideshow({ items }: Props) {
       if (!video) return
       if (i === current) {
         video.currentTime = 0
-        // 브라우저 autoplay 정책상 muted로 시작 후 재생되면 소리 활성화 시도
-        video.muted = true
-        video.play().then(() => {
-          video.muted = mutedRef.current
-        }).catch(() => {})
+        // 브라우저 autoplay 정책상 사용자 제스처 없이 음소거 해제 시 자동으로 일시정지됨 — 항상 음소거로 시작
+        video.muted = mutedRef.current
+        video.play().catch(() => {})
       } else {
         video.pause()
         video.currentTime = 0
@@ -109,15 +107,10 @@ export default function HeroSlideshow({ items }: Props) {
             </>
           ) : (
             <>
-              {/* 블러 배경: 잘리는 부분 없이 여백을 흐린 확대 영상으로 채움 */}
-              <video
-                src={item.media_url}
-                autoPlay={i === current}
-                muted
-                loop
-                playsInline
+              {/* 배경: 영상을 2중으로 로드하면 모바일에서 재생이 멎는 문제가 있어 정적 그라디언트로 대체 */}
+              <div
                 aria-hidden
-                className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-70"
+                className="absolute inset-0 bg-gradient-to-br from-amber-900 via-amber-800 to-stone-900"
               />
               <video
                 ref={(el) => { videoRefs.current[i] = el }}
