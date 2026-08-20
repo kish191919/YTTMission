@@ -110,14 +110,15 @@ export async function deleteAlbumAction(album: string) {
       .from('gallery')
       .select('id, image_url, thumbnail_url')
       .eq('album', album)
-    if (!rows || rows.length === 0) throw new Error('삭제할 사진이 없습니다.')
 
-    const { error } = await supabase.from('gallery').delete().eq('album', album)
-    if (error) throw new Error(error.message)
+    if (rows && rows.length > 0) {
+      const { error } = await supabase.from('gallery').delete().eq('album', album)
+      if (error) throw new Error(error.message)
+    }
 
     await supabase.from('albums').delete().eq('name', album)
 
-    const paths = rows
+    const paths = (rows ?? [])
       .flatMap((r) => [extractStoragePath(r.image_url), r.thumbnail_url ? extractStoragePath(r.thumbnail_url) : null])
       .filter((p): p is string => !!p)
     if (paths.length) await supabase.storage.from('member-uploads').remove(paths)
