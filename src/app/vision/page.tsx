@@ -84,7 +84,7 @@ export default function VisionPage() {
                     {i + 1}. {item.title}{' '}
                     <span className="font-semibold">({item.english})</span>
                   </p>
-                  <p className="text-stone-600 leading-relaxed pl-5 text-base md:text-lg">
+                  <p className="text-stone-600 leading-relaxed pl-5 text-base md:text-lg break-keep">
                     {item.desc}
                   </p>
                 </li>
