@@ -30,6 +30,12 @@ export async function saveGalleryItemsAction(items: GalleryItem[]) {
     user_id: user.id,
   }))
 
+  const uniqueAlbums = Array.from(new Set(items.map((item) => item.album)))
+  await supabase.from('albums').upsert(
+    uniqueAlbums.map((name) => ({ name, year: new Date().getFullYear() })),
+    { onConflict: 'name', ignoreDuplicates: true }
+  )
+
   const { error } = await supabase.from('gallery').insert(rows)
   if (error) throw new Error(error.message)
 
@@ -93,6 +99,8 @@ export async function deleteAlbumAction(album: string) {
     const { error } = await supabase.from('gallery').delete().eq('album', album)
     if (error) throw new Error(error.message)
 
+    await supabase.from('albums').delete().eq('name', album)
+
     const paths = rows.map((r) => extractStoragePath(r.image_url)).filter((p): p is string => !!p)
     if (paths.length) await supabase.storage.from('member-uploads').remove(paths)
 
@@ -118,11 +126,27 @@ export async function deleteAlbumAction(album: string) {
   const { error } = await supabase.from('gallery').delete().eq('album', album)
   if (error) throw new Error(error.message)
 
+  await supabase.from('albums').delete().eq('name', album)
+
   const paths = rows.map((r) => extractStoragePath(r.image_url)).filter((p): p is string => !!p)
   if (paths.length) await supabase.storage.from('member-uploads').remove(paths)
 
   revalidatePath('/gallery')
   redirect('/gallery')
+}
+
+export async function updateAlbumYearAction(album: string, year: number) {
+  const isAdminUser = await isAdmin()
+  if (!isAdminUser) throw new Error('Unauthorized')
+  if (!Number.isInteger(year) || year < 2000 || year > 2100) {
+    throw new Error('올바른 연도를 입력하세요.')
+  }
+
+  const supabase = createAdminClient()
+  const { error } = await supabase.from('albums').upsert({ name: album, year }, { onConflict: 'name' })
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/gallery')
 }
 
 type GalleryUpdateInput = {

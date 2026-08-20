@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { isAdmin } from '@/lib/admin'
 import AlbumDeleteButton from '@/components/gallery/AlbumDeleteButton'
 import AlbumFilterSelect from '@/components/gallery/AlbumFilterSelect'
+import AlbumYearEditor from '@/components/gallery/AlbumYearEditor'
 import GalleryPhotoGrid from '@/components/gallery/GalleryPhotoGrid'
 
 export const metadata: Metadata = {
@@ -14,16 +15,21 @@ export const metadata: Metadata = {
 
 async function getAlbums() {
   const supabase = await createSupabaseServerClient()
-  const { data, error } = await supabase
-    .from('gallery')
-    .select('album, image_url, media_type, taken_at, created_at')
-    .order('created_at', { ascending: false })
-  if (error || !data) return []
+  const [{ data: rows }, { data: albumRows }] = await Promise.all([
+    supabase
+      .from('gallery')
+      .select('album, image_url, media_type, created_at')
+      .order('created_at', { ascending: false }),
+    supabase.from('albums').select('name, year'),
+  ])
+  if (!rows) return []
+
+  const yearMap = new Map((albumRows ?? []).map((a) => [a.name, a.year]))
 
   const map = new Map<string, { thumbnail: string; mediaType: string; year: number }>()
-  for (const row of data) {
+  for (const row of rows) {
     if (row.album && !map.has(row.album)) {
-      const year = new Date(row.taken_at ?? row.created_at).getFullYear()
+      const year = yearMap.get(row.album) ?? new Date(row.created_at).getFullYear()
       map.set(row.album, { thumbnail: row.image_url, mediaType: row.media_type ?? 'image', year })
     }
   }
@@ -73,6 +79,7 @@ export default async function GalleryPage({
     albumsByYear.set(a.year, list)
   }
   const sortedYears = Array.from(albumsByYear.keys()).sort((a, b) => b - a)
+  const currentAlbumYear = album ? albums.find((a) => a.name === album)?.year : undefined
 
   const {
     data: { user },
@@ -178,8 +185,11 @@ export default async function GalleryPage({
         {/* 특정 앨범 사진 그리드 */}
         {album && (
           <>
-            <div className="mb-6">
+            <div className="mb-6 flex items-center gap-3">
               <h2 className="text-xl font-bold text-stone-800">{album}</h2>
+              {admin && currentAlbumYear !== undefined && (
+                <AlbumYearEditor album={album} year={currentAlbumYear} />
+              )}
             </div>
             <GalleryPhotoGrid
               photos={photos}

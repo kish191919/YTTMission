@@ -87,6 +87,22 @@ export type Database = {
         }
         Relationships: []
       }
+      albums: {
+        Row: {
+          name: string
+          year: number
+          created_at: string
+        }
+        Insert: {
+          name: string
+          year: number
+        }
+        Update: {
+          name?: string
+          year?: number
+        }
+        Relationships: []
+      }
       hero_media: {
         Row: {
           id: number

@@ -198,3 +198,31 @@ create policy "본인 갤러리 삭제"
   on public.gallery for delete
   to authenticated
   using (auth.uid() = user_id);
+
+-- ──────────────────────────────────────────────────
+-- 앨범 연도 (수동 지정)
+-- ──────────────────────────────────────────────────
+create table if not exists public.albums (
+  name       text primary key,
+  year       integer not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.albums enable row level security;
+
+create policy "앨범 공개 읽기"
+  on public.albums for select
+  using (true);
+
+create policy "회원 앨범 등록"
+  on public.albums for insert
+  to authenticated
+  with check (true);
+
+-- 기존 gallery 데이터에서 앨범별 연도 백필 (가장 오래된 사진 기준)
+insert into public.albums (name, year)
+select album, min(extract(year from coalesce(taken_at, created_at)))::int
+from public.gallery
+where album is not null
+group by album
+on conflict (name) do nothing;
