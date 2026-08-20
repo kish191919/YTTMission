@@ -123,6 +123,7 @@ export async function deleteAlbumAction(album: string) {
     if (paths.length) await supabase.storage.from('member-uploads').remove(paths)
 
     revalidatePath('/gallery')
+    revalidatePath('/admin/gallery')
     redirect('/gallery')
   }
 
@@ -167,6 +168,7 @@ export async function updateAlbumYearAction(album: string, year: number) {
   if (error) throw new Error(error.message)
 
   revalidatePath('/gallery')
+  revalidatePath('/admin/gallery')
 }
 
 type GalleryUpdateInput = {
@@ -183,6 +185,11 @@ export async function updateGalleryItemAction(id: number, input: GalleryUpdateIn
   } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/gallery')
 
+  await supabase.from('albums').upsert(
+    { name: input.album, year: new Date().getFullYear() },
+    { onConflict: 'name', ignoreDuplicates: true }
+  )
+
   const { error } = await supabase
     .from('gallery')
     .update({
@@ -196,4 +203,65 @@ export async function updateGalleryItemAction(id: number, input: GalleryUpdateIn
 
   revalidatePath('/gallery')
   redirect('/gallery')
+}
+
+type AlbumMetaInput = {
+  name: string
+  location: string | null
+  year: number
+  isPublic: boolean
+}
+
+export async function updateAlbumMetaAction(currentName: string, input: AlbumMetaInput) {
+  const isAdminUser = await isAdmin()
+  if (!isAdminUser) throw new Error('Unauthorized')
+
+  const name = input.name.trim()
+  if (!name) throw new Error('폴더 이름을 입력하세요.')
+  if (!Number.isInteger(input.year) || input.year < 2000 || input.year > 2100) {
+    throw new Error('올바른 연도를 입력하세요.')
+  }
+
+  const supabase = createAdminClient()
+
+  if (name !== currentName) {
+    const { data: existing } = await supabase
+      .from('albums')
+      .select('name')
+      .eq('name', name)
+      .maybeSingle()
+    if (existing) throw new Error('이미 존재하는 폴더 이름입니다.')
+
+    const { error: galleryError } = await supabase
+      .from('gallery')
+      .update({ album: name })
+      .eq('album', currentName)
+    if (galleryError) throw new Error(galleryError.message)
+  }
+
+  const { error } = await supabase
+    .from('albums')
+    .update({
+      name,
+      location: input.location,
+      year: input.year,
+      is_public: input.isPublic,
+    })
+    .eq('name', currentName)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/gallery')
+  revalidatePath('/admin/gallery')
+}
+
+export async function toggleAlbumVisibilityAction(album: string, isPublic: boolean) {
+  const isAdminUser = await isAdmin()
+  if (!isAdminUser) throw new Error('Unauthorized')
+
+  const supabase = createAdminClient()
+  const { error } = await supabase.from('albums').update({ is_public: isPublic }).eq('name', album)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/gallery')
+  revalidatePath('/admin/gallery')
 }

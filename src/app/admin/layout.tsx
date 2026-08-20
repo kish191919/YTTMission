@@ -13,6 +13,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             히어로 미디어
           </Link>
+          <Link
+            href="/admin/gallery"
+            className="text-sm text-amber-700 hover:text-amber-900 font-medium transition-colors"
+          >
+            갤러리 폴더
+          </Link>
         </div>
         <AdminSignOutButton />
       </nav>

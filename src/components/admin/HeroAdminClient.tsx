@@ -1,5 +1,6 @@
 'use client'
 
+import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
@@ -36,6 +37,11 @@ export default function HeroAdminClient({ items }: Props) {
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -44,33 +50,38 @@ export default function HeroAdminClient({ items }: Props) {
     setUploadProgress('업로드 중...')
 
     const isVideo = file.type.startsWith('video/')
+    const ext = file.name.split('.').pop()
+    const storagePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
-    const formData = new FormData()
-    formData.append('file', file)
+    try {
+      // 대용량 동영상은 서버(API 라우트)를 거치지 않고 브라우저에서 Storage로 직접 업로드
+      const { data, error } = await supabase.storage
+        .from('hero-media')
+        .upload(storagePath, file, { contentType: file.type, upsert: false })
 
-    const res = await fetch('/api/admin/upload', { method: 'POST', body: formData })
-    const json = await res.json()
+      if (error || !data) {
+        setUploadError(`업로드 실패: ${error?.message ?? '알 수 없는 오류'}`)
+        setUploadProgress(null)
+        return
+      }
 
-    if (!res.ok) {
-      setUploadError(`업로드 실패: ${json.error ?? res.statusText}`)
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('hero-media').getPublicUrl(data.path)
+
+      setUploadProgress('저장 중...')
+
+      startTransition(async () => {
+        await saveHeroMedia(publicUrl, data.path, isVideo ? 'video' : 'image', title || file.name)
+        setTitle('')
+        setUploadProgress(null)
+        if (fileInputRef.current) fileInputRef.current.value = ''
+        router.refresh()
+      })
+    } catch (err) {
+      setUploadError(`업로드 실패: ${err instanceof Error ? err.message : '알 수 없는 오류'}`)
       setUploadProgress(null)
-      return
     }
-
-    setUploadProgress('저장 중...')
-
-    startTransition(async () => {
-      await saveHeroMedia(
-        json.publicUrl,
-        json.storagePath,
-        isVideo ? 'video' : 'image',
-        title || file.name
-      )
-      setTitle('')
-      setUploadProgress(null)
-      if (fileInputRef.current) fileInputRef.current.value = ''
-      router.refresh()
-    })
   }
 
   function handleAction(fn: () => Promise<void>) {

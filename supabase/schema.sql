@@ -230,3 +230,34 @@ from public.gallery
 where album is not null
 group by album
 on conflict (name) do nothing;
+
+-- ──────────────────────────────────────────────────
+-- 앨범 위치/공개여부 (관리자 편집)
+-- ──────────────────────────────────────────────────
+alter table public.albums
+  add column if not exists location  text,
+  add column if not exists is_public boolean not null default true;
+
+-- gallery.album 값 중 albums 행이 없는 경우 백필
+-- (updateGalleryItemAction으로 앨범명이 자유 입력되어 생긴 누락분 보정)
+insert into public.albums (name, year)
+select album, extract(year from now())::int
+from public.gallery
+where album is not null
+group by album
+on conflict (name) do nothing;
+
+drop policy if exists "앨범 공개 읽기" on public.albums;
+create policy "앨범 공개 읽기"
+  on public.albums for select
+  using (is_public = true);
+
+drop policy if exists "갤러리 공개 읽기" on public.gallery;
+create policy "갤러리 공개 읽기"
+  on public.gallery for select
+  using (
+    exists (
+      select 1 from public.albums a
+      where a.name = gallery.album and a.is_public = true
+    )
+  );

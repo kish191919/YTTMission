@@ -94,15 +94,21 @@ export type Database = {
         Row: {
           name: string
           year: number
+          location: string | null
+          is_public: boolean
           created_at: string
         }
         Insert: {
           name: string
           year: number
+          location?: string | null
+          is_public?: boolean
         }
         Update: {
           name?: string
           year?: number
+          location?: string | null
+          is_public?: boolean
         }
         Relationships: []
       }
