@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { adminEmails } from '@/lib/admin-emails'
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request })
@@ -36,6 +37,14 @@ export async function proxy(request: NextRequest) {
   // 미인증 상태에서 /admin/* 접근 → /admin/login 리디렉트
   if (path.startsWith('/admin') && !path.startsWith('/admin/login') && !user) {
     return NextResponse.redirect(new URL('/admin/login', request.url))
+  }
+
+  // 로그인은 했지만 관리자가 아닌 상태에서 /admin/* 접근 → 홈으로 리디렉트
+  if (path.startsWith('/admin') && !path.startsWith('/admin/login') && user) {
+    const emails = adminEmails()
+    if (!user.email || !emails.includes(user.email.toLowerCase())) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
   }
 
   // 이미 로그인된 상태에서 /admin/login 접근 → /admin/hero 리디렉트

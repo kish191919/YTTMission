@@ -1,11 +1,5 @@
 import { createSupabaseServerClient } from './supabase-server'
-
-function adminEmails(): string[] {
-  return (process.env.ADMIN_EMAILS ?? '')
-    .split(',')
-    .map((email) => email.trim().toLowerCase())
-    .filter(Boolean)
-}
+import { adminEmails } from './admin-emails'
 
 export async function isAdmin(): Promise<boolean> {
   const emails = adminEmails()
