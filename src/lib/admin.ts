@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers'
 import { createSupabaseServerClient } from './supabase-server'
 
 function adminEmails(): string[] {
@@ -9,9 +8,6 @@ function adminEmails(): string[] {
 }
 
 export async function isAdmin(): Promise<boolean> {
-  const cookieStore = await cookies()
-  if (cookieStore.get('yttm_admin')?.value === '1') return true
-
   const emails = adminEmails()
   if (emails.length === 0) return false
 

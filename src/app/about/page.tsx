@@ -52,7 +52,7 @@ function GreetingSection() {
               <h2 className="text-2xl font-black text-stone-800 mb-5">
                 인사말
               </h2>
-              <div className="space-y-4 text-stone-600 leading-relaxed">
+              <div className="space-y-4 text-stone-600 leading-relaxed break-keep text-justify">
                 <p>
                   우리를 사랑하시는 주님 안에서 인사드립니다.
                 </p>

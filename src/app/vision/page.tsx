@@ -55,7 +55,7 @@ export default function VisionPage() {
           <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: MAROON }}>
             우리의 비전
           </h1>
-          <p className="text-lg md:text-xl text-stone-700 leading-relaxed">
+          <p className="text-xl md:text-2xl text-stone-700 leading-relaxed">
             하나님 나라를 전하는 축복의 통로되기 (눅 13:19)
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function VisionPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: MAROON }}>
             우리의 미션
           </h2>
-          <p className="text-lg md:text-xl text-stone-700 leading-relaxed">
+          <p className="text-xl md:text-2xl text-stone-700 leading-relaxed">
             금보다 더 귀한 복음을 탁구공에 담아 전달하며 섬기며
           </p>
         </div>
@@ -80,11 +80,11 @@ export default function VisionPage() {
             <ol className="space-y-7">
               {pledges.map((item, i) => (
                 <li key={i}>
-                  <p className="font-bold text-stone-800 mb-1.5">
+                  <p className="text-xl md:text-2xl font-bold text-stone-800 mb-1.5">
                     {i + 1}. {item.title}{' '}
                     <span className="font-semibold">({item.english})</span>
                   </p>
-                  <p className="text-stone-600 leading-relaxed pl-5 text-sm">
+                  <p className="text-stone-600 leading-relaxed pl-5 text-base md:text-lg">
                     {item.desc}
                   </p>
                 </li>
@@ -112,7 +112,7 @@ export default function VisionPage() {
             </h2>
             <ul className="space-y-2.5">
               {activities.map((item, i) => (
-                <li key={i} className="flex items-start gap-3 text-stone-700 text-sm">
+                <li key={i} className="flex items-start gap-3 text-stone-700 text-base md:text-lg">
                   <span className="mt-[9px] w-[5px] h-[5px] rounded-full bg-stone-500 flex-shrink-0" />
                   <span>{item}</span>
                 </li>

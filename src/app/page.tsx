@@ -57,7 +57,7 @@ function MissionaryGreeting() {
             <h2 className="text-2xl md:text-3xl font-bold text-stone-800 mb-8 leading-snug">
               우리를 사랑하시는 주님 안에서 인사드립니다.
             </h2>
-            <div className="space-y-5 text-stone-600 leading-relaxed">
+            <div className="space-y-5 text-stone-600 leading-relaxed break-keep text-justify">
               <p>
                 1988년 9월 30일. 그 날은 제가 평생 잊을 수 없는 날입니다. 그 날은 올림픽에서
                 제가 현정화 선수와 함께 탁구 역사상 최초의 올림픽 탁구 금메달을 딴 날입니다.
@@ -120,7 +120,7 @@ function RecentActivities({ albums }: { albums: RecentAlbum[] }) {
           <span className="inline-block text-amber-600 font-semibold text-sm uppercase tracking-wider mb-3">
             Activities
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-stone-800 mb-4">최근 선교 현장</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-stone-800 mb-4">활동 현장</h2>
           <p className="text-lg text-stone-500 max-w-2xl mx-auto">
             탁구를 통해 열방에 복음을 전하는 현장의 이야기를 만나보세요.
           </p>
@@ -224,6 +224,20 @@ function Vision() {
   )
 }
 
+/* ── 말씀 띠 섹션 ───────────────────────────── */
+function ScriptureBand() {
+  return (
+    <section className="bg-stone-800 py-6">
+      <div className="max-w-3xl lg:max-w-5xl mx-auto px-3 lg:px-4 text-center">
+        <p className="text-amber-100/90 text-[11px] sm:text-sm lg:text-base italic leading-relaxed tracking-tight sm:tracking-normal break-keep lg:whitespace-nowrap">
+          “하나님께서 세상을 이처럼 사랑하셔서 외아들을 주셨으니, 이는 그를 믿는
+          사람마다 멸망하지 않고 영생을 얻게 하려는 것이다.” (요한복음 3:16)
+        </p>
+      </div>
+    </section>
+  )
+}
+
 /* ── 후원 CTA 섹션 ───────────────────────────── */
 function SupportCTA() {
   return (
@@ -292,6 +306,7 @@ export default async function HomePage() {
       </div>
       <MissionaryGreeting />
       <RecentActivities albums={recentAlbums} />
+      <ScriptureBand />
       <SupportCTA />
     </>
   )

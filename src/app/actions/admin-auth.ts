@@ -1,20 +1,10 @@
 'use server'
 
-import { cookies } from 'next/headers'
+import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 
-export async function adminSignInAction() {
-  const cookieStore = await cookies()
-  cookieStore.set('yttm_admin', '1', {
-    httpOnly: true,
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7일
-    sameSite: 'lax',
-  })
-}
-
 export async function adminSignOutAction() {
-  const cookieStore = await cookies()
-  cookieStore.delete('yttm_admin')
+  const supabase = await createSupabaseServerClient()
+  await supabase.auth.signOut()
   redirect('/')
 }

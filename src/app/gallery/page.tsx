@@ -16,14 +16,15 @@ async function getAlbums() {
   const supabase = await createSupabaseServerClient()
   const { data, error } = await supabase
     .from('gallery')
-    .select('album, image_url, media_type')
+    .select('album, image_url, media_type, taken_at, created_at')
     .order('created_at', { ascending: false })
   if (error || !data) return []
 
-  const map = new Map<string, { thumbnail: string; mediaType: string }>()
+  const map = new Map<string, { thumbnail: string; mediaType: string; year: number }>()
   for (const row of data) {
     if (row.album && !map.has(row.album)) {
-      map.set(row.album, { thumbnail: row.image_url, mediaType: row.media_type ?? 'image' })
+      const year = new Date(row.taken_at ?? row.created_at).getFullYear()
+      map.set(row.album, { thumbnail: row.image_url, mediaType: row.media_type ?? 'image', year })
     }
   }
   return Array.from(map.entries()).map(([name, meta]) => ({ name, ...meta }))
@@ -58,12 +59,20 @@ export default async function GalleryPage({
   searchParams: Promise<{ album?: string }>
 }) {
   const { album } = await searchParams
-  const [photos, albums, supabaseServer, admin] = await Promise.all([
-    getGalleryPhotos(album),
+  const [albums, supabaseServer, admin] = await Promise.all([
     getAlbums(),
     createSupabaseServerClient(),
     isAdmin(),
   ])
+  const photos = album ? await getGalleryPhotos(album) : []
+
+  const albumsByYear = new Map<number, typeof albums>()
+  for (const a of albums) {
+    const list = albumsByYear.get(a.year) ?? []
+    list.push(a)
+    albumsByYear.set(a.year, list)
+  }
+  const sortedYears = Array.from(albumsByYear.keys()).sort((a, b) => b - a)
 
   const {
     data: { user },
@@ -115,46 +124,53 @@ export default async function GalleryPage({
           <AlbumFilterSelect albums={albums} currentAlbum={album} />
         )}
 
-        {/* 앨범 카드 (전체 보기일 때) */}
+        {/* 앨범 카드 (전체 보기일 때, 연도별 그룹핑) */}
         {!album && albums.length > 0 && (
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            {albums.map((a) => (
-              <Link
-                key={a.name}
-                href={`/gallery?album=${encodeURIComponent(a.name)}`}
-                className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-stone-100 overflow-hidden group"
-              >
-                <div className="aspect-video bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center overflow-hidden">
-                  {a.thumbnail ? (
-                    a.mediaType === 'video' ? (
-                      <video
-                        src={a.thumbnail}
-                        className="w-full h-full object-cover"
-                        muted
-                        playsInline
-                        preload="metadata"
-                      />
-                    ) : (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={a.thumbnail}
-                        alt={a.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    )
-                  ) : (
-                    <Camera size={36} className="text-amber-400 group-hover:scale-110 transition-transform" />
-                  )}
+          <div className="space-y-12 mb-12">
+            {sortedYears.map((year) => (
+              <div key={year}>
+                <h2 className="text-lg font-bold text-amber-600 mb-5">{year} 년</h2>
+                <div className="grid md:grid-cols-3 gap-6">
+                  {albumsByYear.get(year)!.map((a) => (
+                    <Link
+                      key={a.name}
+                      href={`/gallery?album=${encodeURIComponent(a.name)}`}
+                      className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-stone-100 overflow-hidden group"
+                    >
+                      <div className="aspect-video bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center overflow-hidden">
+                        {a.thumbnail ? (
+                          a.mediaType === 'video' ? (
+                            <video
+                              src={a.thumbnail}
+                              className="w-full h-full object-cover"
+                              muted
+                              playsInline
+                              preload="metadata"
+                            />
+                          ) : (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={a.thumbnail}
+                              alt={a.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          )
+                        ) : (
+                          <Camera size={36} className="text-amber-400 group-hover:scale-110 transition-transform" />
+                        )}
+                      </div>
+                      <div className="p-5">
+                        <h3 className="font-bold text-stone-800 group-hover:text-amber-700 transition-colors mb-1">
+                          {a.name}
+                        </h3>
+                        <div className="mt-3 flex items-center gap-1 text-amber-600 text-sm font-medium">
+                          사진 보기 <ChevronRight size={14} />
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-                <div className="p-5">
-                  <h3 className="font-bold text-stone-800 group-hover:text-amber-700 transition-colors mb-1">
-                    {a.name}
-                  </h3>
-                  <div className="mt-3 flex items-center gap-1 text-amber-600 text-sm font-medium">
-                    사진 보기 <ChevronRight size={14} />
-                  </div>
-                </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}
@@ -174,20 +190,7 @@ export default async function GalleryPage({
           </>
         )}
 
-        {/* 전체 보기에서 최근 사진 */}
-        {!album && photos.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold text-stone-800 mb-5">최근 사진</h2>
-            <GalleryPhotoGrid
-              photos={photos}
-              admin={admin}
-              currentUserId={user?.id ?? null}
-              zipFileName="갤러리.zip"
-            />
-          </div>
-        )}
-
-        {!album && photos.length === 0 && albums.length === 0 && (
+        {!album && albums.length === 0 && (
           <div className="text-center py-16 text-stone-400">
             <Camera size={48} className="mx-auto mb-4 opacity-40" />
             <p className="text-lg font-medium">선교 사진이 곧 업로드됩니다</p>

@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { LogIn } from 'lucide-react'
-import { adminSignInAction } from '@/app/actions/admin-auth'
 
 function LoginForm() {
   const [email, setEmail] = useState('')
@@ -26,14 +25,6 @@ function LoginForm() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-
-    // 어드민 자격증명 감지
-    if (email.trim() === 'admin' && password === 'yttm') {
-      await adminSignInAction()
-      router.push(next)
-      router.refresh()
-      return
-    }
 
     const { error } = await supabase.auth.signInWithPassword({ email, password })
 
@@ -68,7 +59,7 @@ function LoginForm() {
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1.5">이메일</label>
             <input
-              type="text"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
