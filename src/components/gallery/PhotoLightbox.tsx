@@ -71,6 +71,7 @@ export default function PhotoLightbox({ photos, index, onClose, onNavigate }: Pr
         {photo.media_type === 'video' ? (
           <video
             src={photo.image_url}
+            poster={photo.thumbnail_url ?? undefined}
             className="max-w-[90vw] max-h-[80vh] rounded-lg"
             controls
             autoPlay

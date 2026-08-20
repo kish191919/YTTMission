@@ -18,7 +18,7 @@ async function getAlbums() {
   const [{ data: rows }, { data: albumRows }] = await Promise.all([
     supabase
       .from('gallery')
-      .select('album, image_url, media_type, created_at')
+      .select('album, image_url, thumbnail_url, media_type, created_at')
       .order('created_at', { ascending: false }),
     supabase.from('albums').select('name, year'),
   ])
@@ -26,11 +26,19 @@ async function getAlbums() {
 
   const yearMap = new Map((albumRows ?? []).map((a) => [a.name, a.year]))
 
-  const map = new Map<string, { thumbnail: string; mediaType: string; year: number }>()
+  const map = new Map<
+    string,
+    { thumbnail: string; thumbnailUrl: string | null; mediaType: string; year: number }
+  >()
   for (const row of rows) {
     if (row.album && !map.has(row.album)) {
       const year = yearMap.get(row.album) ?? new Date(row.created_at).getFullYear()
-      map.set(row.album, { thumbnail: row.image_url, mediaType: row.media_type ?? 'image', year })
+      map.set(row.album, {
+        thumbnail: row.image_url,
+        thumbnailUrl: row.thumbnail_url,
+        mediaType: row.media_type ?? 'image',
+        year,
+      })
     }
   }
   return Array.from(map.entries()).map(([name, meta]) => ({ name, ...meta }))
@@ -149,6 +157,7 @@ export default async function GalleryPage({
                           a.mediaType === 'video' ? (
                             <video
                               src={a.thumbnail}
+                              poster={a.thumbnailUrl ?? undefined}
                               className="w-full h-full object-cover"
                               muted
                               playsInline

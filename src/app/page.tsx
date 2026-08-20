@@ -108,7 +108,7 @@ function MissionaryGreeting() {
 }
 
 /* ── 최근 선교 활동 ───────────────────────────── */
-type RecentAlbum = { name: string; thumbnail: string | null; mediaType: string }
+type RecentAlbum = { name: string; thumbnail: string | null; thumbnailUrl: string | null; mediaType: string }
 
 function RecentActivities({ albums }: { albums: RecentAlbum[] }) {
   if (albums.length === 0) return null
@@ -140,6 +140,7 @@ function RecentActivities({ albums }: { albums: RecentAlbum[] }) {
                     album.mediaType === 'video' ? (
                       <video
                         src={album.thumbnail}
+                        poster={album.thumbnailUrl ?? undefined}
                         className="w-full h-full object-cover"
                         muted
                         playsInline
@@ -275,15 +276,19 @@ export default async function HomePage() {
       .order('display_order', { ascending: true }),
     supabase
       .from('gallery')
-      .select('album, image_url, media_type')
+      .select('album, image_url, thumbnail_url, media_type')
       .order('created_at', { ascending: false }),
     isAdmin(),
   ])
 
-  const albumMap = new Map<string, { thumbnail: string; mediaType: string }>()
+  const albumMap = new Map<string, { thumbnail: string; thumbnailUrl: string | null; mediaType: string }>()
   for (const row of galleryRows ?? []) {
     if (row.album && !albumMap.has(row.album)) {
-      albumMap.set(row.album, { thumbnail: row.image_url, mediaType: row.media_type ?? 'image' })
+      albumMap.set(row.album, {
+        thumbnail: row.image_url,
+        thumbnailUrl: row.thumbnail_url,
+        mediaType: row.media_type ?? 'image',
+      })
     }
   }
   const recentAlbums = Array.from(albumMap.entries())

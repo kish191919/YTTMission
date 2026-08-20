@@ -11,6 +11,7 @@ type GalleryItem = {
   mediaUrl: string
   mediaType: 'image' | 'video'
   album: string
+  thumbnailUrl?: string
 }
 
 export async function saveGalleryItemsAction(items: GalleryItem[]) {
@@ -28,6 +29,7 @@ export async function saveGalleryItemsAction(items: GalleryItem[]) {
     media_type: item.mediaType,
     album: item.album,
     user_id: user.id,
+    thumbnail_url: item.thumbnailUrl ?? null,
   }))
 
   const uniqueAlbums = Array.from(new Set(items.map((item) => item.album)))
@@ -55,12 +57,20 @@ export async function deleteGalleryItemAction(id: number) {
 
   if (isAdminUser) {
     const supabase = createAdminClient()
-    const { data: row } = await supabase.from('gallery').select('image_url').eq('id', id).single()
+    const { data: row } = await supabase
+      .from('gallery')
+      .select('image_url, thumbnail_url')
+      .eq('id', id)
+      .single()
     const { error } = await supabase.from('gallery').delete().eq('id', id)
     if (error) throw new Error(error.message)
 
-    const storagePath = row ? extractStoragePath(row.image_url) : null
-    if (storagePath) await supabase.storage.from('member-uploads').remove([storagePath])
+    const paths = row
+      ? [extractStoragePath(row.image_url), row.thumbnail_url ? extractStoragePath(row.thumbnail_url) : null].filter(
+          (p): p is string => !!p
+        )
+      : []
+    if (paths.length) await supabase.storage.from('member-uploads').remove(paths)
 
     revalidatePath('/gallery')
     return
@@ -74,7 +84,7 @@ export async function deleteGalleryItemAction(id: number) {
 
   const { data: row } = await supabase
     .from('gallery')
-    .select('image_url, user_id')
+    .select('image_url, thumbnail_url, user_id')
     .eq('id', id)
     .single()
   if (!row || row.user_id !== user.id) throw new Error('Unauthorized')
@@ -82,8 +92,11 @@ export async function deleteGalleryItemAction(id: number) {
   const { error } = await supabase.from('gallery').delete().eq('id', id)
   if (error) throw new Error(error.message)
 
-  const storagePath = extractStoragePath(row.image_url)
-  if (storagePath) await supabase.storage.from('member-uploads').remove([storagePath])
+  const paths = [
+    extractStoragePath(row.image_url),
+    row.thumbnail_url ? extractStoragePath(row.thumbnail_url) : null,
+  ].filter((p): p is string => !!p)
+  if (paths.length) await supabase.storage.from('member-uploads').remove(paths)
 
   revalidatePath('/gallery')
 }
@@ -93,7 +106,10 @@ export async function deleteAlbumAction(album: string) {
 
   if (isAdminUser) {
     const supabase = createAdminClient()
-    const { data: rows } = await supabase.from('gallery').select('id, image_url').eq('album', album)
+    const { data: rows } = await supabase
+      .from('gallery')
+      .select('id, image_url, thumbnail_url')
+      .eq('album', album)
     if (!rows || rows.length === 0) throw new Error('삭제할 사진이 없습니다.')
 
     const { error } = await supabase.from('gallery').delete().eq('album', album)
@@ -101,7 +117,9 @@ export async function deleteAlbumAction(album: string) {
 
     await supabase.from('albums').delete().eq('name', album)
 
-    const paths = rows.map((r) => extractStoragePath(r.image_url)).filter((p): p is string => !!p)
+    const paths = rows
+      .flatMap((r) => [extractStoragePath(r.image_url), r.thumbnail_url ? extractStoragePath(r.thumbnail_url) : null])
+      .filter((p): p is string => !!p)
     if (paths.length) await supabase.storage.from('member-uploads').remove(paths)
 
     revalidatePath('/gallery')
@@ -116,7 +134,7 @@ export async function deleteAlbumAction(album: string) {
 
   const { data: rows } = await supabase
     .from('gallery')
-    .select('id, image_url, user_id')
+    .select('id, image_url, thumbnail_url, user_id')
     .eq('album', album)
   if (!rows || rows.length === 0) throw new Error('삭제할 사진이 없습니다.')
   if (rows.some((r) => r.user_id !== user.id)) {
@@ -128,7 +146,9 @@ export async function deleteAlbumAction(album: string) {
 
   await supabase.from('albums').delete().eq('name', album)
 
-  const paths = rows.map((r) => extractStoragePath(r.image_url)).filter((p): p is string => !!p)
+  const paths = rows
+    .flatMap((r) => [extractStoragePath(r.image_url), r.thumbnail_url ? extractStoragePath(r.thumbnail_url) : null])
+    .filter((p): p is string => !!p)
   if (paths.length) await supabase.storage.from('member-uploads').remove(paths)
 
   revalidatePath('/gallery')

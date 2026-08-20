@@ -1,9 +1,9 @@
 'use client'
 
-import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Lock } from 'lucide-react'
+import { loginAction } from '@/app/actions/login'
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('')
@@ -12,17 +12,12 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await loginAction(email, password)
 
     if (error) {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.')
@@ -51,12 +46,12 @@ export default function AdminLoginPage() {
               이메일
             </label>
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
-              placeholder="admin@example.com"
+              placeholder="admin@example.com 또는 admin"
             />
           </div>
 

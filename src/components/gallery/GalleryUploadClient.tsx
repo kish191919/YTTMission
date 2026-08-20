@@ -1,17 +1,23 @@
 'use client'
 
 import { createBrowserClient } from '@supabase/ssr'
-import { useRef, useState, useTransition } from 'react'
-import { Upload, X, ImageIcon, Film, CheckCircle, Loader2 } from 'lucide-react'
+import { useEffect, useRef, useState, useTransition } from 'react'
+import { Upload, X, ImageIcon, Film, CheckCircle, Loader2, ImagePlus } from 'lucide-react'
 import { saveGalleryItemsAction } from '@/app/actions/gallery'
+import { captureVideoThumbnail } from '@/lib/captureVideoThumbnail'
 
 type FileEntry = {
+  id: string
   file: File
   title: string
   mediaType: 'image' | 'video'
   status: 'pending' | 'uploading' | 'done' | 'error'
   errorMsg?: string
   url?: string
+  thumbBlob?: Blob | File
+  thumbPreviewUrl?: string
+  thumbSource?: 'auto' | 'custom' | 'none'
+  thumbStatus?: 'generating' | 'ready' | 'error'
 }
 
 type Props = {
@@ -20,34 +26,105 @@ type Props = {
 
 export default function GalleryUploadClient({ userId }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const thumbInputRef = useRef<HTMLInputElement>(null)
   const [album, setAlbum] = useState('')
   const [entries, setEntries] = useState<FileEntry[]>([])
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [thumbTargetId, setThumbTargetId] = useState<string | null>(null)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
+  const entriesRef = useRef(entries)
+  useEffect(() => {
+    entriesRef.current = entries
+  }, [entries])
+  useEffect(() => {
+    return () => {
+      entriesRef.current.forEach((entry) => {
+        if (entry.thumbPreviewUrl) URL.revokeObjectURL(entry.thumbPreviewUrl)
+      })
+    }
+  }, [])
+
   function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
-    const newEntries: FileEntry[] = files.map((file) => ({
-      file,
-      title: file.name.replace(/\.[^/.]+$/, ''),
-      mediaType: file.type.startsWith('video/') ? 'video' : 'image',
-      status: 'pending',
-    }))
+    const newEntries: FileEntry[] = files.map((file) => {
+      const mediaType: 'image' | 'video' = file.type.startsWith('video/') ? 'video' : 'image'
+      return {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        file,
+        title: file.name.replace(/\.[^/.]+$/, ''),
+        mediaType,
+        status: 'pending',
+        thumbStatus: mediaType === 'video' ? 'generating' : undefined,
+        thumbSource: mediaType === 'video' ? 'auto' : undefined,
+      }
+    })
     setEntries((prev) => [...prev, ...newEntries])
     if (fileInputRef.current) fileInputRef.current.value = ''
+
+    for (const entry of newEntries) {
+      if (entry.mediaType !== 'video') continue
+      captureVideoThumbnail(entry.file, 2).then((blob) => {
+        setEntries((prev) =>
+          prev.map((e) => {
+            if (e.id !== entry.id) return e
+            if (e.thumbSource === 'custom') return e
+            if (!blob) return { ...e, thumbStatus: 'error', thumbSource: 'none' }
+            return {
+              ...e,
+              thumbBlob: blob,
+              thumbPreviewUrl: URL.createObjectURL(blob),
+              thumbStatus: 'ready',
+              thumbSource: 'auto',
+            }
+          })
+        )
+      })
+    }
   }
 
   function removeEntry(idx: number) {
-    setEntries((prev) => prev.filter((_, i) => i !== idx))
+    setEntries((prev) => {
+      const target = prev[idx]
+      if (target?.thumbPreviewUrl) URL.revokeObjectURL(target.thumbPreviewUrl)
+      return prev.filter((_, i) => i !== idx)
+    })
   }
 
   function updateTitle(idx: number, title: string) {
     setEntries((prev) => prev.map((e, i) => (i === idx ? { ...e, title } : e)))
+  }
+
+  function openThumbPicker(id: string) {
+    setThumbTargetId(id)
+    thumbInputRef.current?.click()
+  }
+
+  function handleThumbSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    const targetId = thumbTargetId
+    e.target.value = ''
+    setThumbTargetId(null)
+    if (!file || !targetId) return
+
+    setEntries((prev) =>
+      prev.map((entry) => {
+        if (entry.id !== targetId) return entry
+        if (entry.thumbPreviewUrl) URL.revokeObjectURL(entry.thumbPreviewUrl)
+        return {
+          ...entry,
+          thumbBlob: file,
+          thumbPreviewUrl: URL.createObjectURL(file),
+          thumbSource: 'custom',
+          thumbStatus: 'ready',
+        }
+      })
+    )
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -63,7 +140,13 @@ export default function GalleryUploadClient({ userId }: Props) {
       return
     }
 
-    const uploaded: { title: string; mediaUrl: string; mediaType: 'image' | 'video'; album: string }[] = []
+    const uploaded: {
+      title: string
+      mediaUrl: string
+      mediaType: 'image' | 'video'
+      album: string
+      thumbnailUrl?: string
+    }[] = []
 
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i]
@@ -90,6 +173,19 @@ export default function GalleryUploadClient({ userId }: Props) {
       const { data: urlData } = supabase.storage.from('member-uploads').getPublicUrl(data.path)
       const publicUrl = urlData.publicUrl
 
+      let thumbnailUrl: string | undefined
+      if (entry.mediaType === 'video' && entry.thumbBlob) {
+        const thumbExt = entry.thumbBlob instanceof File ? entry.thumbBlob.name.split('.').pop() || 'jpg' : 'jpg'
+        const thumbPath = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}-thumb.${thumbExt}`
+        const { data: thumbData, error: thumbError } = await supabase.storage
+          .from('member-uploads')
+          .upload(thumbPath, entry.thumbBlob, { upsert: false })
+        if (!thumbError && thumbData) {
+          const { data: thumbUrlData } = supabase.storage.from('member-uploads').getPublicUrl(thumbData.path)
+          thumbnailUrl = thumbUrlData.publicUrl
+        }
+      }
+
       setEntries((prev) =>
         prev.map((e, idx) => (idx === i ? { ...e, status: 'done', url: publicUrl } : e))
       )
@@ -99,6 +195,7 @@ export default function GalleryUploadClient({ userId }: Props) {
         mediaUrl: publicUrl,
         mediaType: entry.mediaType,
         album: album.trim(),
+        thumbnailUrl,
       })
     }
 
@@ -159,6 +256,13 @@ export default function GalleryUploadClient({ userId }: Props) {
               onChange={handleFilesSelected}
               className="hidden"
             />
+            <input
+              ref={thumbInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleThumbSelected}
+              className="hidden"
+            />
 
             {entries.length === 0 ? (
               <button
@@ -174,7 +278,7 @@ export default function GalleryUploadClient({ userId }: Props) {
               <div className="space-y-3">
                 {entries.map((entry, idx) => (
                   <div
-                    key={idx}
+                    key={entry.id}
                     className="flex items-center gap-3 p-3 rounded-xl border border-stone-100 bg-stone-50"
                   >
                     <div className="shrink-0 w-8 h-8 rounded-lg bg-white border border-stone-200 flex items-center justify-center">
@@ -184,6 +288,31 @@ export default function GalleryUploadClient({ userId }: Props) {
                         <ImageIcon size={15} className="text-stone-400" />
                       )}
                     </div>
+                    {entry.mediaType === 'video' && (
+                      <div className="shrink-0 flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-stone-200 border border-stone-200 flex items-center justify-center">
+                          {entry.thumbPreviewUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={entry.thumbPreviewUrl}
+                              alt="썸네일 미리보기"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : entry.thumbStatus === 'generating' ? (
+                            <Loader2 size={14} className="text-stone-400 animate-spin" />
+                          ) : (
+                            <ImagePlus size={14} className="text-stone-300" />
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => openThumbPicker(entry.id)}
+                          className="text-[10px] font-medium text-amber-600 hover:text-amber-700 transition-colors whitespace-nowrap"
+                        >
+                          썸네일 변경
+                        </button>
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <input
                         type="text"

@@ -61,6 +61,7 @@ export type Database = {
           title: string
           description: string | null
           image_url: string
+          thumbnail_url: string | null
           album: string
           taken_at: string | null
           created_at: string
@@ -71,6 +72,7 @@ export type Database = {
           title: string
           description?: string | null
           image_url: string
+          thumbnail_url?: string | null
           album?: string
           taken_at?: string | null
           user_id?: string | null
@@ -80,6 +82,7 @@ export type Database = {
           title?: string
           description?: string | null
           image_url?: string
+          thumbnail_url?: string | null
           album?: string
           taken_at?: string | null
           user_id?: string | null

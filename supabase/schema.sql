@@ -156,6 +156,10 @@ alter table public.gallery
   add column if not exists media_type text not null default 'image'
     check (media_type in ('image', 'video'));
 
+-- E. 갤러리 썸네일 컬럼 추가 (동영상 자동/커스텀 썸네일)
+alter table public.gallery
+  add column if not exists thumbnail_url text;
+
 -- 회원 게시글 작성 (즉시 공개)
 create policy "회원 게시글 작성"
   on public.posts for insert

@@ -12,6 +12,7 @@ export type GalleryPhoto = {
   title: string
   description: string | null
   image_url: string
+  thumbnail_url: string | null
   album: string
   taken_at: string | null
   created_at: string
@@ -232,6 +233,7 @@ export default function GalleryPhotoGrid({ photos, admin, currentUserId, zipFile
               {photo.media_type === 'video' ? (
                 <video
                   src={photo.image_url}
+                  poster={photo.thumbnail_url ?? undefined}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   muted
                   playsInline
