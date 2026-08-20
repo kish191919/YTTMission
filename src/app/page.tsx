@@ -108,7 +108,7 @@ function MissionaryGreeting() {
 }
 
 /* ── 최근 선교 활동 ───────────────────────────── */
-type RecentAlbum = { name: string; thumbnail: string | null; thumbnailUrl: string | null; mediaType: string }
+type RecentAlbum = { name: string; thumbnail: string | null; thumbnailUrl: string | null; mediaType: string; year: number }
 
 function RecentActivities({ albums }: { albums: RecentAlbum[] }) {
   if (albums.length === 0) return null
@@ -268,7 +268,7 @@ function SupportCTA() {
 }
 
 export default async function HomePage() {
-  const [{ data: heroItems }, { data: galleryRows }, admin] = await Promise.all([
+  const [{ data: heroItems }, { data: galleryRows }, { data: albumRows }, admin] = await Promise.all([
     supabase
       .from('hero_media')
       .select('id, title, media_url, media_type, display_order')
@@ -276,24 +276,33 @@ export default async function HomePage() {
       .order('display_order', { ascending: true }),
     supabase
       .from('gallery')
-      .select('album, image_url, thumbnail_url, media_type')
+      .select('album, image_url, thumbnail_url, media_type, created_at')
       .order('created_at', { ascending: false }),
+    supabase.from('albums').select('name, year'),
     isAdmin(),
   ])
 
-  const albumMap = new Map<string, { thumbnail: string; thumbnailUrl: string | null; mediaType: string }>()
+  const yearMap = new Map((albumRows ?? []).map((a) => [a.name, a.year]))
+
+  const albumMap = new Map<
+    string,
+    { thumbnail: string; thumbnailUrl: string | null; mediaType: string; year: number; latestCreatedAt: string }
+  >()
   for (const row of galleryRows ?? []) {
     if (row.album && !albumMap.has(row.album)) {
       albumMap.set(row.album, {
         thumbnail: row.image_url,
         thumbnailUrl: row.thumbnail_url,
         mediaType: row.media_type ?? 'image',
+        year: yearMap.get(row.album) ?? new Date(row.created_at).getFullYear(),
+        latestCreatedAt: row.created_at,
       })
     }
   }
   const recentAlbums = Array.from(albumMap.entries())
-    .slice(0, 3)
     .map(([name, meta]) => ({ name, ...meta }))
+    .sort((a, b) => b.year - a.year || b.latestCreatedAt.localeCompare(a.latestCreatedAt))
+    .slice(0, 3)
 
   return (
     <>
