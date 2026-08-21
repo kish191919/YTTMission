@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, Check, CheckSquare, Download, Loader2, Trash2 } from 'lucide-react'
+import { Camera, Check, CheckSquare, Download, Film, Loader2, Trash2 } from 'lucide-react'
 import PhotoItemControls from '@/components/gallery/PhotoItemControls'
 import PhotoLightbox from '@/components/gallery/PhotoLightbox'
 import { deleteGalleryItemAction } from '@/app/actions/gallery'
@@ -231,14 +231,18 @@ export default function GalleryPhotoGrid({ photos, admin, currentUserId, zipFile
               }`}
             >
               {photo.media_type === 'video' ? (
-                <video
-                  src={photo.image_url}
-                  poster={photo.thumbnail_url ?? undefined}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  muted
-                  playsInline
-                  preload="metadata"
-                />
+                photo.thumbnail_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={photo.thumbnail_url}
+                    alt={photo.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-stone-100">
+                    <Film size={32} className="text-stone-300" />
+                  </div>
+                )
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img

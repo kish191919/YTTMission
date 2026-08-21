@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart, Camera, ChevronRight, Award, Settings } from 'lucide-react'
+import { Heart, Camera, Film, ChevronRight, Award, Settings } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { isAdmin } from '@/lib/admin'
 import HeroSlideshow from '@/components/HeroSlideshow'
@@ -138,14 +138,16 @@ function RecentActivities({ albums }: { albums: RecentAlbum[] }) {
                 <div className="aspect-video bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center overflow-hidden">
                   {album.thumbnail ? (
                     album.mediaType === 'video' ? (
-                      <video
-                        src={album.thumbnail}
-                        poster={album.thumbnailUrl ?? undefined}
-                        className="w-full h-full object-cover"
-                        muted
-                        playsInline
-                        preload="metadata"
-                      />
+                      album.thumbnailUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={album.thumbnailUrl}
+                          alt={album.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <Film size={40} className="text-amber-400 group-hover:scale-110 transition-transform duration-200" />
+                      )
                     ) : (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
