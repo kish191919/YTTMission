@@ -93,7 +93,7 @@ export default function HeroAdminClient({ items }: Props) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-stone-800 mb-8">히어로 미디어 관리</h1>
+      <h1 className="text-2xl font-bold text-stone-800 mb-8">메인 화면 관리</h1>
 
       {/* 업로드 영역 */}
       <div className="bg-white rounded-2xl border border-stone-200 p-6 mb-8">
