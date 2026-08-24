@@ -35,6 +35,11 @@ export const metadata: Metadata = {
   verification: {
     google: '88vzWs6BkeG0rB7PPY2OwdvKDefRLLfbkCw_hSaJP3g',
   },
+  alternates: {
+    types: {
+      'application/rss+xml': '/rss.xml',
+    },
+  },
   other: {
     'naver-site-verification': '549ef6cde18650e0ca0734c77592933ae6268008',
   },
