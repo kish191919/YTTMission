@@ -3,9 +3,10 @@
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import Image from 'next/image'
-import { Camera, Eye, EyeOff, Loader2, Pencil, Trash2 } from 'lucide-react'
+import { Camera, ChevronDown, ChevronUp, Eye, EyeOff, Loader2, Pencil, Trash2 } from 'lucide-react'
 import {
   deleteAlbumAction,
+  reorderAlbumAction,
   toggleAlbumVisibilityAction,
   updateAlbumMetaAction,
 } from '@/app/actions/gallery'
@@ -66,7 +67,7 @@ export default function GalleryFolderAdminClient({ folders }: Props) {
           </div>
         ) : (
           <ul className="divide-y divide-stone-100">
-            {folders.map((folder) =>
+            {folders.map((folder, index) =>
               editingName === folder.name ? (
                 <FolderEditRow
                   key={folder.name}
@@ -108,6 +109,23 @@ export default function GalleryFolderAdminClient({ folders }: Props) {
                   </div>
 
                   <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => handleAction(() => reorderAlbumAction(folder.name, 'up'))}
+                      disabled={index === 0 || isPending}
+                      title="위로"
+                      className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 disabled:opacity-30 transition-colors"
+                    >
+                      <ChevronUp size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleAction(() => reorderAlbumAction(folder.name, 'down'))}
+                      disabled={index === folders.length - 1 || isPending}
+                      title="아래로"
+                      className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 disabled:opacity-30 transition-colors"
+                    >
+                      <ChevronDown size={16} />
+                    </button>
+
                     <button
                       onClick={() => setEditingName(folder.name)}
                       disabled={isPending}

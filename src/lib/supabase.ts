@@ -96,6 +96,7 @@ export type Database = {
           year: number
           location: string | null
           is_public: boolean
+          sort_order: number
           created_at: string
         }
         Insert: {
@@ -103,12 +104,14 @@ export type Database = {
           year: number
           location?: string | null
           is_public?: boolean
+          sort_order?: number
         }
         Update: {
           name?: string
           year?: number
           location?: string | null
           is_public?: boolean
+          sort_order?: number
         }
         Relationships: []
       }

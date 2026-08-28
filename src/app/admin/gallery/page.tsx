@@ -10,7 +10,7 @@ export default async function AdminGalleryPage() {
 
   const supabase = createAdminClient()
   const [{ data: albums }, { data: galleryRows }] = await Promise.all([
-    supabase.from('albums').select('*').order('year', { ascending: false }),
+    supabase.from('albums').select('*').order('sort_order', { ascending: true }),
     supabase.from('gallery').select('album, image_url, thumbnail_url, media_type'),
   ])
 

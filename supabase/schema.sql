@@ -261,3 +261,26 @@ create policy "갤러리 공개 읽기"
       where a.name = gallery.album and a.is_public = true
     )
   );
+
+-- ──────────────────────────────────────────────────
+-- 앨범 표시 순서 (관리자 화면 정렬용)
+-- ──────────────────────────────────────────────────
+alter table public.albums
+  add column if not exists sort_order integer not null default 0;
+
+-- 기존 행 백필: 관리자 화면에 보이던 순서(연도 내림차순)를 그대로 유지
+with ordered as (
+  select name, row_number() over (order by year desc, ctid) as rn
+  from public.albums
+)
+update public.albums a
+set sort_order = ordered.rn
+from ordered
+where a.name = ordered.name;
+
+create sequence if not exists public.albums_sort_order_seq
+  owned by public.albums.sort_order;
+select setval('public.albums_sort_order_seq', (select coalesce(max(sort_order), 0) from public.albums));
+
+alter table public.albums
+  alter column sort_order set default nextval('public.albums_sort_order_seq');

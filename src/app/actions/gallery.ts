@@ -266,3 +266,38 @@ export async function toggleAlbumVisibilityAction(album: string, isPublic: boole
   revalidatePath('/gallery')
   revalidatePath('/admin/gallery')
 }
+
+export async function reorderAlbumAction(name: string, direction: 'up' | 'down') {
+  const isAdminUser = await isAdmin()
+  if (!isAdminUser) throw new Error('Unauthorized')
+
+  const supabase = createAdminClient()
+
+  const { data: current } = await supabase
+    .from('albums')
+    .select('name, sort_order')
+    .eq('name', name)
+    .single()
+  if (!current) return
+
+  const { data: neighbor } = await supabase
+    .from('albums')
+    .select('name, sort_order')
+    .eq('sort_order', direction === 'up' ? current.sort_order - 1 : current.sort_order + 1)
+    .maybeSingle()
+  if (!neighbor) return
+
+  const { error: e1 } = await supabase
+    .from('albums')
+    .update({ sort_order: neighbor.sort_order })
+    .eq('name', current.name)
+
+  const { error: e2 } = await supabase
+    .from('albums')
+    .update({ sort_order: current.sort_order })
+    .eq('name', neighbor.name)
+
+  if (e1 || e2) throw new Error('순서 변경 실패')
+
+  revalidatePath('/admin/gallery')
+}
