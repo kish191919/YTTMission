@@ -20,11 +20,12 @@ async function getAlbums() {
       .from('gallery')
       .select('album, image_url, thumbnail_url, media_type, created_at')
       .order('created_at', { ascending: false }),
-    supabase.from('albums').select('name, year'),
+    supabase.from('albums').select('name, year, sort_order'),
   ])
   if (!rows) return []
 
   const yearMap = new Map((albumRows ?? []).map((a) => [a.name, a.year]))
+  const sortOrderMap = new Map((albumRows ?? []).map((a) => [a.name, a.sort_order]))
 
   const map = new Map<
     string,
@@ -41,7 +42,13 @@ async function getAlbums() {
       })
     }
   }
-  return Array.from(map.entries()).map(([name, meta]) => ({ name, ...meta }))
+  return Array.from(map.entries())
+    .map(([name, meta]) => ({ name, ...meta }))
+    .sort(
+      (a, b) =>
+        (sortOrderMap.get(a.name) ?? Number.MAX_SAFE_INTEGER) -
+        (sortOrderMap.get(b.name) ?? Number.MAX_SAFE_INTEGER)
+    )
 }
 
 async function getGalleryPhotos(album?: string) {
