@@ -267,6 +267,39 @@ export async function toggleAlbumVisibilityAction(album: string, isPublic: boole
   revalidatePath('/admin/gallery')
 }
 
+export async function setAlbumCoverAction(album: string, photoId: number) {
+  const isAdminUser = await isAdmin()
+  if (!isAdminUser) throw new Error('Unauthorized')
+
+  const supabase = createAdminClient()
+  const { data: photo } = await supabase
+    .from('gallery')
+    .select('album, image_url, thumbnail_url, media_type')
+    .eq('id', photoId)
+    .single()
+  if (!photo || photo.album !== album) throw new Error('잘못된 요청입니다.')
+
+  const coverUrl = photo.media_type === 'video' ? (photo.thumbnail_url ?? photo.image_url) : photo.image_url
+
+  const { error } = await supabase.from('albums').update({ cover_image_url: coverUrl }).eq('name', album)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/gallery')
+  revalidatePath('/admin/gallery')
+}
+
+export async function resetAlbumCoverAction(album: string) {
+  const isAdminUser = await isAdmin()
+  if (!isAdminUser) throw new Error('Unauthorized')
+
+  const supabase = createAdminClient()
+  const { error } = await supabase.from('albums').update({ cover_image_url: null }).eq('name', album)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/gallery')
+  revalidatePath('/admin/gallery')
+}
+
 export async function reorderAlbumAction(name: string, direction: 'up' | 'down') {
   const isAdminUser = await isAdmin()
   if (!isAdminUser) throw new Error('Unauthorized')

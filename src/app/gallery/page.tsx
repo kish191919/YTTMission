@@ -6,6 +6,7 @@ import { isAdmin } from '@/lib/admin'
 import AlbumDeleteButton from '@/components/gallery/AlbumDeleteButton'
 import AlbumFilterSelect from '@/components/gallery/AlbumFilterSelect'
 import AlbumYearEditor from '@/components/gallery/AlbumYearEditor'
+import AlbumCoverResetButton from '@/components/gallery/AlbumCoverResetButton'
 import GalleryPhotoGrid from '@/components/gallery/GalleryPhotoGrid'
 
 export const metadata: Metadata = {
@@ -20,12 +21,13 @@ async function getAlbums() {
       .from('gallery')
       .select('album, image_url, thumbnail_url, media_type, created_at')
       .order('created_at', { ascending: false }),
-    supabase.from('albums').select('name, year, sort_order'),
+    supabase.from('albums').select('name, year, sort_order, cover_image_url'),
   ])
   if (!rows) return []
 
   const yearMap = new Map((albumRows ?? []).map((a) => [a.name, a.year]))
   const sortOrderMap = new Map((albumRows ?? []).map((a) => [a.name, a.sort_order]))
+  const coverMap = new Map((albumRows ?? []).map((a) => [a.name, a.cover_image_url as string | null]))
 
   const map = new Map<
     string,
@@ -43,7 +45,12 @@ async function getAlbums() {
     }
   }
   return Array.from(map.entries())
-    .map(([name, meta]) => ({ name, ...meta }))
+    .map(([name, meta]) => {
+      const manualCover = coverMap.get(name)
+      return manualCover
+        ? { name, thumbnail: manualCover, thumbnailUrl: null, mediaType: 'image', year: meta.year, hasManualCover: true }
+        : { name, ...meta, hasManualCover: false }
+    })
     .sort(
       (a, b) =>
         (sortOrderMap.get(a.name) ?? Number.MAX_SAFE_INTEGER) -
@@ -94,7 +101,9 @@ export default async function GalleryPage({
     albumsByYear.set(a.year, list)
   }
   const sortedYears = Array.from(albumsByYear.keys()).sort((a, b) => b - a)
-  const currentAlbumYear = album ? albums.find((a) => a.name === album)?.year : undefined
+  const currentAlbumMeta = album ? albums.find((a) => a.name === album) : undefined
+  const currentAlbumYear = currentAlbumMeta?.year
+  const currentAlbumCoverUrl = currentAlbumMeta?.hasManualCover ? currentAlbumMeta.thumbnail : null
 
   const {
     data: { user },
@@ -206,12 +215,15 @@ export default async function GalleryPage({
               {admin && currentAlbumYear !== undefined && (
                 <AlbumYearEditor album={album} year={currentAlbumYear} />
               )}
+              {admin && currentAlbumCoverUrl && <AlbumCoverResetButton album={album} />}
             </div>
             <GalleryPhotoGrid
               photos={photos}
               admin={admin}
               currentUserId={user?.id ?? null}
               zipFileName={`${album}.zip`}
+              album={album}
+              currentCoverUrl={currentAlbumCoverUrl}
             />
           </>
         )}

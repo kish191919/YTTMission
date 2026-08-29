@@ -29,7 +29,7 @@ export default async function AdminGalleryPage() {
     location: a.location,
     isPublic: a.is_public,
     photoCount: countMap.get(a.name) ?? 0,
-    thumbnail: thumbMap.get(a.name) ?? null,
+    thumbnail: a.cover_image_url ?? thumbMap.get(a.name) ?? null,
   }))
 
   return <GalleryFolderAdminClient folders={folders} />

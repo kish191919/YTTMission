@@ -97,6 +97,7 @@ export type Database = {
           location: string | null
           is_public: boolean
           sort_order: number
+          cover_image_url: string | null
           created_at: string
         }
         Insert: {
@@ -105,6 +106,7 @@ export type Database = {
           location?: string | null
           is_public?: boolean
           sort_order?: number
+          cover_image_url?: string | null
         }
         Update: {
           name?: string
@@ -112,6 +114,7 @@ export type Database = {
           location?: string | null
           is_public?: boolean
           sort_order?: number
+          cover_image_url?: string | null
         }
         Relationships: []
       }

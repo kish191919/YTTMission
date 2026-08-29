@@ -284,3 +284,9 @@ select setval('public.albums_sort_order_seq', (select coalesce(max(sort_order), 
 
 alter table public.albums
   alter column sort_order set default nextval('public.albums_sort_order_seq');
+
+-- ──────────────────────────────────────────────────
+-- 앨범 대표 이미지(커버) 수동 지정
+-- ──────────────────────────────────────────────────
+alter table public.albums
+  add column if not exists cover_image_url text;

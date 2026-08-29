@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Camera, Check, CheckSquare, Download, Film, Loader2, Trash2 } from 'lucide-react'
 import PhotoItemControls from '@/components/gallery/PhotoItemControls'
+import AlbumCoverButton from '@/components/gallery/AlbumCoverButton'
 import PhotoLightbox from '@/components/gallery/PhotoLightbox'
 import { deleteGalleryItemAction } from '@/app/actions/gallery'
 
@@ -25,6 +26,8 @@ type Props = {
   admin: boolean
   currentUserId: string | null
   zipFileName: string
+  album: string
+  currentCoverUrl: string | null
 }
 
 function filenameFor(photo: GalleryPhoto, index?: number) {
@@ -46,7 +49,14 @@ function triggerBlobDownload(blob: Blob, filename: string) {
   URL.revokeObjectURL(url)
 }
 
-export default function GalleryPhotoGrid({ photos, admin, currentUserId, zipFileName }: Props) {
+export default function GalleryPhotoGrid({
+  photos,
+  admin,
+  currentUserId,
+  zipFileName,
+  album,
+  currentCoverUrl,
+}: Props) {
   const router = useRouter()
   const [selectionMode, setSelectionMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
@@ -56,6 +66,12 @@ export default function GalleryPhotoGrid({ photos, admin, currentUserId, zipFile
 
   function isOwnedByCurrentUser(photo: GalleryPhoto) {
     return photo.user_id !== null && photo.user_id === currentUserId
+  }
+
+  function isCurrentCover(photo: GalleryPhoto) {
+    if (!currentCoverUrl) return false
+    const coverSource = photo.media_type === 'video' ? (photo.thumbnail_url ?? photo.image_url) : photo.image_url
+    return coverSource === currentCoverUrl
   }
 
   const deletablePhotos = photos.filter(
@@ -254,6 +270,11 @@ export default function GalleryPhotoGrid({ photos, admin, currentUserId, zipFile
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-3">
                 <p className="text-white text-xs font-medium line-clamp-2">{photo.title}</p>
               </div>
+              {!selectionMode && admin && (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <AlbumCoverButton album={album} photoId={photo.id} isCover={isCurrentCover(photo)} />
+                </div>
+              )}
               {selectionMode && (
                 <button
                   onClick={(e) => {
