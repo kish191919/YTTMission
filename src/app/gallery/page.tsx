@@ -174,7 +174,7 @@ export default async function GalleryPage({
                             <video
                               src={a.thumbnail}
                               poster={a.thumbnailUrl ?? undefined}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                               muted
                               playsInline
                               preload="metadata"
@@ -184,7 +184,7 @@ export default async function GalleryPage({
                             <img
                               src={a.thumbnail}
                               alt={a.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                             />
                           )
                         ) : (
